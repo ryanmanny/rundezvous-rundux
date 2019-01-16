@@ -1,0 +1,5 @@
+{% block chat %}
+    {% for message in messages %}
+        {% include 'message.html' with message=message index=forloop.counter %}
+    {% endfor %}
+{% endblock %}

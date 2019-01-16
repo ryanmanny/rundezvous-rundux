@@ -1,0 +1,9 @@
+{% if index == 1 %} {# This might be total insanity #}
+<div class="message message-you">
+    {{ message.text }}
+</div>
+{% else %}
+<div class="message message-them">
+    {{ message.text }}
+</div>
+{% endif %}
