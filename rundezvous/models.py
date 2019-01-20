@@ -18,9 +18,9 @@ class SiteUser(auth_models.AbstractUser):
         null=True,  # User can exist without room
         blank=True,
         on_delete=models.SET_NULL,
-        related_name='participants',  # TODO: I think this is coupling...
+        related_name='active_participants',  # TODO: Might be coupling
     )
-    last_location = gis_models.PointField(  # For position-based game elements
+    last_location = models.PointField(  # For position-based game elements
         verbose_name="Last Known Location",
         null=True,
         blank=True,

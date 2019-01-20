@@ -7,7 +7,7 @@ AUTH_USER_MODEL = settings.AUTH_USER_MODEL
 
 
 class ChatRoom(models.Model):
-    is_archived = models.BooleanField()
+    is_archived = models.BooleanField()  # Users can no longer view, messages can no longer be sent
 
 
 class ChatMessage(models.Model):
@@ -28,5 +28,5 @@ class ChatMessage(models.Model):
     )
 
     class Meta:
-        # TODO: This might be unnecessary because sent_at correlated with id
-        ordering = 'sent_at'
+        # TODO: This might be unnecessary because sent_at should correlated with id
+        ordering = ('sent_at',)

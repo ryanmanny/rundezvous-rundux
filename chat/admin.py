@@ -7,6 +7,7 @@ from django.contrib import admin
 from chat import models
 
 
+@admin.register(models.ChatRoom)
 class ChatRoomAdmin(admin.ModelAdmin):
     model = models.ChatRoom
 
@@ -23,21 +24,19 @@ class ChatRoomAdmin(admin.ModelAdmin):
         Returns a string representing all users in ChatRoom, sep. by commas
         obj describes the current row being displayed
         """
-        return ", ".join(
-            set(
-                f"{participant}"
-                for participant
-                in obj.partipants.distinct()
-            )
-        )
+        return "MESSAGES"
+        # return ", ".join(
+        #     set(
+        #         f"{participant}"
+        #         for participant
+        #         in obj.messages.distinct()
+        #     )
+        # )
 
     list_display = [
-        participants,
+        'participants',
     ]
 
     list_select_related = [
-        'participants',  # Should reduce participants # queries I hope
+        # 'participants',  illegal
     ]
-
-
-admin.register(ChatRoomAdmin)

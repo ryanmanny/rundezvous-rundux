@@ -81,22 +81,14 @@ WSGI_APPLICATION = 'rundezvous_rundux.wsgi.application'
 # https://docs.djangoproject.com/en/2.1/ref/contrib/gis/db-api/#mysql-spatial-limitations
 
 
+SPATIALITE_LIBRARY_PATH = 'mod_spatialite.so'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.spatialite',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
-if os.name == 'nt':
-    GEO_DIR = r"C:\OSGeo4W64"
-
-    os.environ['OSGEO4W_ROOT'] = GEO_DIR
-    os.environ['GDAL_DATA'] = os.path.join(GEO_DIR, r"\share\gdal")
-    os.environ['PROJ_LIB'] = os.path.join(GEO_DIR, r"\share\proj")
-    os.environ['PATH'] += os.path.join(GEO_DIR, r"\bin;")
-
-GDAL_LIBRARY_PATH = 'C:\OSGeo4W\bin\gdal204.dll'
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
