@@ -1,0 +1,42 @@
+.chatroom-wrapper {
+    width: 600px;
+    position: absolute;
+    bottom: 0;
+}
+
+.chatroom-header {
+    margin: 0 auto;
+    width: 100px;
+}
+
+.messages-wrapper {
+
+}
+
+.message-submit {
+    float: right;
+    padding-bottom: 20px;
+}
+
+.message {
+    font-family: Roboto, sans-serif;
+}
+
+.message-box {
+    display: inline-block;
+    padding: 5px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.message-box-left {
+    margin-right: 100%;
+    float: left;
+    background-color: gray;
+}
+
+.message-box-right {
+    margin-left: 100%;
+    float: right;
+    background-color: blue;
+}

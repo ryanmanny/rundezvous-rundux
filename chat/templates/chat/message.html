@@ -1,0 +1,9 @@
+{% if right_align %}
+<div class="message-box message-box-right">
+    <span class="message" id="message{{ message.id }}" data-message-id="{{ message.id }}">{{ message.text }}</span>
+</div>
+{% else %}
+<div class="message-box message-box-left">
+    <span class="message" id="message{{ message.id }}" data-message-id="{{ message.id }}">{{ message.text }}</span>
+</div>
+{% endif %}

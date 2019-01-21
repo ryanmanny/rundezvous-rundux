@@ -21,11 +21,10 @@ class ChatRoom(models.Model):
         Returns the set of User objects who have sent messages to this Room
         """
         return set(
-            participant
-            for participant
-            in get_user_model().objects.filter(
+            get_user_model().objects.filter(
                 id__in=Subquery(
-                    self.messages.values_list('sent_by_id', flat=True)
+                    # TODO: Make sure this order_by won't break in the future
+                    self.messages.values_list('sent_by_id', flat=True).order_by().distinct()
                 )
             )
         )

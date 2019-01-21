@@ -1,0 +1,23 @@
+{% extends 'chat/base.html' %}
+
+{% block content %}
+<div class="chatroom-wrapper">
+    {% include 'chat/chatroom_header.html' with header_text=room_name %}
+    <div class="messages-wrapper" id="messages-wrapper">
+    {% for message in room.messages.all %}
+        {# Automatically renders existing messages #}
+        {% if user == message.sent_by %}
+            {% include 'chat/message.html' with message=message right_align=True %}
+        {% else %}
+            {% include 'chat/message.html' with message=message right_align=False %}
+        {% endif %}
+    {% endfor %}
+    </div>
+    {% include 'chat/message_submit.html' %}
+</div>
+
+<script>
+    ajax_form('#message-submit');
+    check_for_messages();
+</script>
+{% endblock %}
