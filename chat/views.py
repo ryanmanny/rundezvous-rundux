@@ -16,7 +16,7 @@ def chatroom(request, room_id):
         )
     ]
 
-    render(
+    return render(
         request,
         'chatroom.html',
         {
