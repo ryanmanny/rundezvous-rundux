@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth.views import LoginView, LogoutView
 
-from rundezvous import views
+from rundezvous import views as run_views
 
 
 urlpatterns = [
@@ -25,9 +25,9 @@ urlpatterns = [
     path('run/', include('rundezvous.urls')),
     path('chat/', include('chat.urls')),
 
-    path('', views.home, name='home'),
+    path('', run_views.home, name='home'),
 
     path('accounts/logout/', LogoutView.as_view(), name='logout'),
     path('accounts/login/', LoginView.as_view(), name='login'),
-    path('accounts/signup/', views.signup, name='signup'),
+    path('accounts/signup/', run_views.signup, name='signup'),
 ]
