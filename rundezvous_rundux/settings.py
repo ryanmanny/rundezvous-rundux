@@ -132,3 +132,6 @@ STATICFILES_DIRS = [
 ]
 
 AUTH_USER_MODEL = 'rundezvous.SiteUser'
+
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'home'

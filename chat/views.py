@@ -4,8 +4,8 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
 from django.http import HttpResponseForbidden, Http404
 
-from chat import forms
 from chat import models
+from chat import forms
 
 
 @login_required
@@ -33,6 +33,7 @@ def chatroom(request):
             'room_name': room_name,
         },
     )
+
 
 @login_required
 def new_messages(request, last_message_id):
