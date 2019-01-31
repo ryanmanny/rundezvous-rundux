@@ -11,16 +11,14 @@ from rundezvous import models
 class SiteUserAdmin(admin.ModelAdmin):
     model = models.SiteUser
 
-    fields = [  # Hides fields that I don't care about
-        'username',
-        'email',
-
-        'is_superuser',
-        'is_staff',
-        'is_active',
-
-        'display_name',
-        'reputation',
-        'active_room',
-        'last_location',
+    fieldsets = [
+        ('User', {
+            'fields': ('username', 'email', 'is_superuser', 'is_staff', 'is_active',),
+        }),
+        ('Profile', {
+            'fields': ('display_name', 'active_room', 'reputation',),
+        }),
+        ('Location', {
+            'fields': ('last_location', 'last_region',),
+        }),
     ]

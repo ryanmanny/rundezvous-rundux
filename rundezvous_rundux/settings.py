@@ -41,6 +41,7 @@ INSTALLED_APPS = [
 
     'rundezvous.apps.RundezvousConfig',
     'chat.apps.ChatConfig',
+    'places.apps.WorldConfig',
 ]
 
 MIDDLEWARE = [
