@@ -10,6 +10,10 @@ class SupportedRegion(models.Model):
 
     region = models.PolygonField()  # Assume university is contiguous
 
+    class UnsupportedRegionError(Exception):
+        """User is not in any supported region
+        """
+
 
 class Landmark(models.Model):
     """
