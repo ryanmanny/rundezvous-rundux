@@ -17,16 +17,10 @@ class ChatRoom(models.Model):
 
     @property
     def participants(self):
+        """Returns the User objects who have sent messages to this Room
         """
-        Returns the set of User objects who have sent messages to this Room
-        """
-        return set(
-            get_user_model().objects.filter(
-                id__in=Subquery(
-                    # TODO: Make sure this order_by won't break in the future
-                    self.messages.values_list('sent_by_id', flat=True).order_by().distinct()
-                )
-            )
+        return get_user_model().objects.filter(
+            id__in=self.messages.values_list('sent_by_id', flat=True).distinct()
         )
 
     def archive(self):
