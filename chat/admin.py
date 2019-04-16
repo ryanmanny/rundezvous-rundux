@@ -50,7 +50,8 @@ class ChatMessageAdmin(admin.ModelAdmin):
         'sent_by__email',
     ]
 
-    def room_link(self, obj):
+    @staticmethod
+    def room_link(obj):
         link = reverse("admin:chat_chatroom_change", args=[obj.room.id])
         return format_html('<a href="{}">{}</a>', link, obj.room)
 
