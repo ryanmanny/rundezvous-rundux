@@ -31,6 +31,10 @@ def chatroom(request):
 
 @login_required
 def new_messages(request, last_message_id):
+    """
+    Bad polling function to get messages since the last one the user knows of
+    TODO: This MUST be replaced with RabbitMQ or Django Channels
+    """
     user = request.user
 
     room = user.active_room
