@@ -25,7 +25,7 @@ class Landmark(models.Model):
     location = models.PointField()
 
     region = models.ForeignKey(
-        SupportedRegion,
+        'SupportedRegion',
         null=True,
         blank=True,
         on_delete=models.SET_NULL,

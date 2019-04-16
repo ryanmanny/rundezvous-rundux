@@ -17,10 +17,6 @@ from rundezvous import managers
 
 
 class SiteUser(auth_models.AbstractUser):
-    class Meta:
-        verbose_name = "Site User"
-        verbose_name_plural = "Site Users"
-
     email = models.EmailField(  # Overrides email field of AbstractUser
         unique=True,
         null=False,

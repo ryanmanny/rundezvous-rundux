@@ -7,10 +7,6 @@ from django.db.models import Subquery
 
 
 class ChatRoom(models.Model):
-    class Meta:
-        verbose_name = "Chat Room"
-        verbose_name_plural = "Chat Rooms"
-
     is_active = models.BooleanField(
         default=True,
     )
@@ -33,13 +29,10 @@ class ChatRoom(models.Model):
 
 class ChatMessage(models.Model):
     class Meta:
-        verbose_name = "Chat Message"
-        verbose_name_plural = "Chat Messages"
-
         ordering = ('sent_at',)  # TODO: This might be unnecessary because sent_at should correlated with id
 
     room = models.ForeignKey(
-        ChatRoom,
+        'ChatRoom',
         on_delete=models.CASCADE,  # Message can't exist without room
         related_name='messages',
     )
