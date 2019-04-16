@@ -70,7 +70,9 @@ class SiteUser(auth_models.AbstractUser):
         return f"{self._meta.verbose_name} <{self.display_name if self.display_name else 'NONE'} - {self.email}>"
 
     def update_location(self, new_location):
-        """Called by the middleware to update user's location
+        """
+        Called by the middleware to update user's location
+        TODO: Add to middleware
         """
         self.location = new_location
 
@@ -84,7 +86,9 @@ class SiteUser(auth_models.AbstractUser):
             self.handle_rundezvous_arrival()
 
     def update_region(self):
-        """Returns whether user is in a supported location
+        """
+        Called by the middleware to update user's region
+        TODO: Add to middleware
         """
         try:
             region = place_models.SupportedRegion.objects.get(
@@ -102,7 +106,8 @@ class SiteUser(auth_models.AbstractUser):
 
     @property
     def is_near_rundezvous(self):
-        """Returns True if user is within some distance of destination
+        """
+        Returns True if user is within some distance of destination
         """
         distance = self.location.distance(
             self.active_rundezvous.landmark.location)
@@ -110,12 +115,15 @@ class SiteUser(auth_models.AbstractUser):
         return measure.Distance(m=distance) < const.MEETUP_DISTANCE_THRESHOLD
 
     def handle_rundezvous_arrival(self):
-        """TODO: Make this an event or something like that?
+        """
+        TODO: Make this an event or something like that?
         """
         raise NotImplementedError
 
+    @property
     def new_users(self):
-        """Gets users within current region who user has not met with yet
+        """
+        Gets all users within current region who user has not met with yet
         """
         return SiteUser.objects.filter(
             region=self.region,
@@ -124,21 +132,27 @@ class SiteUser(auth_models.AbstractUser):
             id__not_in=self.met_users,  # Has everyone met themselves?
         )
 
-    def new_users_within(self, miles):
-        """Gets all users within distance miles of user
+    def get_new_users_within(self, miles):
+        """
+        Gets all users less than distance miles away from user
         """
         distance = measure.Distance(mi=miles)
 
-        return self.new_users().distance(self.location).filter(
+        return self.new_users.distance(self.location).filter(
             location__distance_lt=(self.location, distance),
         )  # Annotates QuerySet with distance
 
+    @property
     def closest_new_user(self):
-        return self.new_users_within(miles=2).first('distance')
+        """
+        Gets closest new user to user
+        """
+        return self.get_new_users_within(miles=2).first('distance')
 
 
 class Rundezvous(models.Model):
-    """The titular unit of data, describes the meetup between two+ users
+    """
+    The titular unit of data, describes the meetup between two+ users
     """
     objects = managers.RundezvousManager.\
         from_queryset(managers.RundezvousSet)

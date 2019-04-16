@@ -9,6 +9,10 @@ from rundezvous import models
 
 @admin.register(models.SiteUser)
 class SiteUserAdmin(admin.ModelAdmin):
+    """
+    SiteUser Admin page
+    Organizes fields into three sections based on logical partitions of a user
+    """
     model = models.SiteUser
 
     fieldsets = [

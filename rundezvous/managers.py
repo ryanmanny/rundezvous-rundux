@@ -15,7 +15,8 @@ from rundezvous import const
 # SiteUser
 class SiteUserSet(models.QuerySet):
     def add_close_users(self):
-        """I think this will have to be a crummy approximation for now
+        """
+        I think this will have to be a crummy approximation for now
         """
         ...
 
