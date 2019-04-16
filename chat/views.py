@@ -17,12 +17,6 @@ def chatroom(request):
     if room is None:
         return HttpResponseNotFound("You are not in any chatroom")
 
-    room_name = ", ".join(
-        participant.display_name or "NONE"
-        for participant
-        in room.participants.exclude(id=user.id)
-    )
-
     return render(
         request,
         'chat/chatroom.html',
@@ -30,7 +24,7 @@ def chatroom(request):
             'form': forms.TextForm,
             'user': user,
             'room': room,
-            'room_name': room_name,
+            'room_name': room.name,
         },
     )
 

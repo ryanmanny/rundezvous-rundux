@@ -12,19 +12,15 @@ class ChatRoom(models.Model):
     )
 
     @property
-    def participants(self):
-        """Returns the User objects who have sent messages to this Room
-        """
-        return get_user_model().objects.filter(
-            id__in=self.messages.values_list('sent_by_id', flat=True).distinct()
-        )
+    def name(self):
+        return ", ".join(user.display_name for user in self.siteuser_set.all())
 
     def archive(self):
         self.is_active = False
         self.save()
 
     def __str__(self):
-        return f"{self._meta.verbose_name} <{self.participants}>"
+        return f"{self._meta.verbose_name} <{self.name}>"
 
 
 class ChatMessage(models.Model):

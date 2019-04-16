@@ -23,24 +23,22 @@ class ChatRoomAdmin(admin.ModelAdmin):
     ]
 
     @staticmethod
-    def participants(obj):
+    def room_name(obj):
         """
         Returns a string representing all users in ChatRoom, sep. by commas
         obj describes the current row being displayed
+        TODO: Avoid doing O(N) queries to generate all the names
         """
-        return ", ".join(
-            str(participant)
-            for participant
-            in obj.participants
-        )
+        return obj.name
 
     list_display = [
-        'participants',
+        'room_name',
         'is_active',
     ]
 
     list_select_related = [
-        # 'messages'  This would have to be a prefetch_related
+        # 'siteuser_set',
+        # 'messages',  # These would have to be a prefetch_related
     ]
 
 
