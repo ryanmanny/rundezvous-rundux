@@ -20,7 +20,7 @@ def chatroom(request):
     room_name = ", ".join(
         participant.display_name or "NONE"
         for participant
-        in room.participants.exclude(user=user)
+        in room.participants.exclude(id=user.id)
     )
 
     return render(
