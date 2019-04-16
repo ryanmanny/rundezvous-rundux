@@ -11,7 +11,17 @@ class SiteUserSet(models.QuerySet):
     def add_close_users(self):
         """I think this will have to be a crummy approximation for now
         """
-        pass
+        ...
+
+    def get_midpoint(self) -> Point:
+        """
+        Finds midpoint from User.location
+        """
+        return self.aggregate(
+            midpoint=Centroid(  # Centroid calculates the midpoint of a Geometry
+                Collect('location')
+            )
+        )['midpoint']
 
 
 class SiteUserManager(models.Manager):
