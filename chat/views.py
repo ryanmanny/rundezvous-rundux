@@ -13,6 +13,10 @@ from chat import forms
 
 @login_required
 def chatroom(request):
+    """
+    Renders chatroom for the current user
+    TODO: Render title in correct location
+    """
     user = request.user
 
     room = user.active_room
