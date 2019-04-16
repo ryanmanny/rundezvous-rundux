@@ -19,6 +19,6 @@ class SiteUserAdmin(admin.ModelAdmin):
             'fields': ('display_name', 'active_room', 'reputation',),
         }),
         ('Location', {
-            'fields': ('last_location', 'last_region',),
+            'fields': ('location', 'region',),
         }),
     ]
