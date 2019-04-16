@@ -14,7 +14,7 @@ from chat import forms
 @login_required
 def chatroom(request):
     """
-    Renders chatroom for the current user
+    Renders ChatRoom for the current user
     TODO: Render title in correct location
     """
     user = request.user
@@ -39,7 +39,8 @@ def chatroom(request):
 @login_required
 def new_messages(request, last_message_id):
     """
-    Bad polling function to get messages since the last one the user knows of
+    Bad polling function to get messages since the last one the user has
+    It's also very easily abusable
     TODO: This MUST be replaced with RabbitMQ or Django Channels
     """
     user = request.user

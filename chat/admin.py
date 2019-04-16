@@ -12,6 +12,10 @@ from chat import models
 
 @admin.register(models.ChatRoom)
 class ChatRoomAdmin(admin.ModelAdmin):
+    """
+    Displays a ChatRoom along with all messages sent
+    TODO: Optimize queries to avoid O(N) exponential explosion
+    """
     model = models.ChatRoom
 
     class ChatMessageInline(admin.TabularInline):
@@ -27,7 +31,6 @@ class ChatRoomAdmin(admin.ModelAdmin):
         """
         Returns a string representing all users in ChatRoom, sep. by commas
         obj describes the current row being displayed
-        TODO: Avoid doing O(N) queries to generate all the names
         """
         return obj.name
 
@@ -44,6 +47,9 @@ class ChatRoomAdmin(admin.ModelAdmin):
 
 @admin.register(models.ChatMessage)
 class ChatMessageAdmin(admin.ModelAdmin):
+    """
+    Displays a ChatMessage, and link to edit its corresponding ChatRoom
+    """
     model = models.ChatMessage
 
     search_fields = [

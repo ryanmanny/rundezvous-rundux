@@ -4,16 +4,26 @@ from django.db import models
 
 from chat.const import MAX_MESSAGE_LENGTH
 
+
 class ChatRoom(models.Model):
+    """
+    Represents an abstract ChatRoom, accessible to user's based on user.active_room
+    """
     is_active = models.BooleanField(
         default=True,
     )
 
     @property
     def name(self):
+        """
+        Joins names of all participants in room together
+        """
         return ", ".join(user.display_name for user in self.siteuser_set.all())
 
     def archive(self):
+        """
+        Set to True when no users can access anymore
+        """
         self.is_active = False
         self.save()
 
@@ -22,6 +32,9 @@ class ChatRoom(models.Model):
 
 
 class ChatMessage(models.Model):
+    """
+    Abstract ChatMessage, associated with a ChatRoom
+    """
     class Meta:
         ordering = ('sent_at',)  # TODO: This might be unnecessary because sent_at should correlated with id
 
