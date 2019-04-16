@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 
 from django.http import HttpResponse, JsonResponse
-from django.http import HttpResponseForbidden, Http404
+from django.http import HttpResponseForbidden, HttpResponseNotFound
 
 from chat import models
 from chat import forms
@@ -15,12 +15,12 @@ def chatroom(request):
     room = user.active_room
 
     if room is None:
-        return Http404()
+        return HttpResponseNotFound("You are not in any chatroom")
 
     room_name = ", ".join(
         participant.display_name or "NONE"
         for participant
-        in room.participants - {user}
+        in room.participants.exclude(user=user)
     )
 
     return render(
