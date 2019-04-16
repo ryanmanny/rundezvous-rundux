@@ -1,5 +1,11 @@
-from django.db import models
-from django.db.models import F
+from django.contrib.gis.db import models
+from django.contrib.gis.db.models import F
+
+from django.contrib.gis.geos import Point
+# https://docs.djangoproject.com/en/2.1/ref/contrib/gis/functions
+from django.contrib.gis.db.models.functions import Centroid
+# https://docs.djangoproject.com/en/2.1/ref/contrib/gis/geoquerysets
+from django.contrib.gis.db.models.aggregates import Collect
 
 from django.utils import timezone
 
