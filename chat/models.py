@@ -2,9 +2,7 @@ from django.conf import settings
 
 from django.db import models
 
-from django.contrib.auth import get_user_model
-from django.db.models import Subquery
-
+from chat.const import MAX_MESSAGE_LENGTH
 
 class ChatRoom(models.Model):
     is_active = models.BooleanField(
@@ -33,7 +31,7 @@ class ChatMessage(models.Model):
         related_name='messages',
     )
     text = models.CharField(
-        max_length=140,  # Twitter knew what they were doing I guess
+        max_length=MAX_MESSAGE_LENGTH,  # Twitter knew what they were doing I guess
     )
     sent_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
