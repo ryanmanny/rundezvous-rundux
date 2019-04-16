@@ -36,7 +36,7 @@ class RundezvousSet(models.QuerySet):
         """
         now = timezone.now()
         return self.filter(
-            created_at__gt=now - const.max_rundezvous_expiration
+            created_at__gt=now - const.MAX_RUNDEZVOUS_EXPIRATION
         ).annotate(
             time_left=now - F('created_at') - F('expiration_seconds')
         ).filter(

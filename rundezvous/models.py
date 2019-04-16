@@ -107,7 +107,7 @@ class SiteUser(auth_models.AbstractUser):
         distance = self.location.distance(
             self.active_rundezvous.landmark.location)
 
-        return measure.Distance(m=distance) < const.meetup_distance_threshold
+        return measure.Distance(m=distance) < const.MEETUP_DISTANCE_THRESHOLD
 
     def handle_rundezvous_arrival(self):
         """TODO: Make this an event or something like that?
@@ -155,7 +155,7 @@ class Rundezvous(models.Model):
     expiration_seconds = models.IntegerField(
         validators=[
             MinValueValidator(0),
-            MaxValueValidator(const.max_rundezvous_expiration.seconds),
+            MaxValueValidator(const.MAX_RUNDEZVOUS_EXPIRATION.seconds),
         ]
     )
 
