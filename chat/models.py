@@ -2,7 +2,7 @@ from django.conf import settings
 
 from django.db import models
 
-from chat.const import MAX_MESSAGE_LENGTH
+from chat import const
 
 
 class ChatRoom(models.Model):
@@ -44,7 +44,7 @@ class ChatMessage(models.Model):
         related_name='messages',
     )
     text = models.CharField(
-        max_length=MAX_MESSAGE_LENGTH,  # Twitter knew what they were doing I guess
+        max_length=const.MAX_MESSAGE_LENGTH,  # Twitter knew what they were doing I guess
     )
     sent_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
