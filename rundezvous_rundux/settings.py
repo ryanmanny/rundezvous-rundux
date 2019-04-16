@@ -52,6 +52,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'rundezvous.middleware.LocationMiddleware',
 ]
 
 ROOT_URLCONF = 'rundezvous_rundux.urls'
