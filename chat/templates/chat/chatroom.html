@@ -4,20 +4,20 @@
 <div class="chatroom-wrapper">
     {% include 'chat/chatroom_header.html' with header_text=room_name %}
     <div class="messages-wrapper" id="messages-wrapper">
-    {% for message in room.messages.all %}
-        {# Automatically renders existing messages #}
-        {% if user == message.sent_by %}
-            {% include 'chat/message.html' with message=message right_align=True %}
-        {% else %}
-            {% include 'chat/message.html' with message=message right_align=False %}
-        {% endif %}
-    {% endfor %}
-    </div>
+        <ul class="messages-list" id="messages-list">
+        {% for message in room.messages.all %}
+            {# Automatically renders existing messages #}
+            {% include 'chat/message.html' with user=user message=message %}
+        {% endfor %}
+        </ul>
     {% include 'chat/message_send.html' %}
+    </div>
 </div>
 
 <script>
-    ajax_form('#message-submit');
+    ajax_form('#message-submit', function(data) {
+        $('#messages-list').append(data);
+    });
     check_for_messages();
 </script>
 {% endblock %}

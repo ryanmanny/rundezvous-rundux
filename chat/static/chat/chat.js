@@ -23,13 +23,16 @@ function load_message(id)
         url: '/chat/message/' + id,
         type: 'GET',
         success: function (data) {
-            $('#messages-wrapper').append(data)
+            $('#messages-list').append(data)
         }
     });
 }
 
-function check_for_messages()
+function check_for_messages(timeout)
 {
+    if (timeout === undefined)
+        timeout = 1000;  // One second by default
+
     // Eventually do this asynchronously
     last_message_id = $('.message').last().data('message-id');
 
@@ -43,5 +46,5 @@ function check_for_messages()
         }
     });
 
-    setTimeout(check_for_messages, 1000);
+    setTimeout(check_for_messages, timeout);
 }

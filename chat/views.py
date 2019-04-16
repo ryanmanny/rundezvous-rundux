@@ -1,8 +1,11 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 
-from django.http import HttpResponse, JsonResponse
-from django.http import HttpResponseForbidden, HttpResponseNotFound
+from django.http import (
+    JsonResponse,
+    HttpResponseNotFound,
+    HttpResponseBadRequest,
+)
 
 from chat import models
 from chat import forms
@@ -48,8 +51,12 @@ def new_messages(request, last_message_id):
 
 @login_required
 def message(request, message_id=None):
+    """
+    TODO: Should this be two views?
+    TODO: Make this a class-based view?
+    """
     user = request.user
-    room = user.active_room
+    room = user.active_room  # Make sure user can only get msg from his room
 
     if request.method == "GET":
         try:
@@ -58,28 +65,25 @@ def message(request, message_id=None):
                 id=message_id,
             )
         except models.ChatMessage.DoesNotExist:
-            return HttpResponseForbidden
-        else:
-            return render(
-                request,
-                'chat/message.html',
-                {
-                    'message': message,
-                    'right_align': user == message.sent_by,
-                }
-            )
-
-    if request.method == "POST":
+            return HttpResponseNotFound
+    elif request.method == "POST":
         assert message_id is None
 
         text = request.POST['text']
 
-        models.ChatMessage.objects.create(
+        message = models.ChatMessage.objects.create(
             text=text,
             sent_by=user,
             room=room,
         )
+    else:
+        return HttpResponseBadRequest
 
-        return JsonResponse({
-            'success': True,
-        })
+    return render(
+        request,
+        'chat/message.html',
+        {
+            'message': message,
+            'user': user,
+        }
+    )
