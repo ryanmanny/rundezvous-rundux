@@ -1,3 +1,5 @@
 from django.shortcuts import render
 
-# Create your views here.
+
+def geo_test(request):
+    return render(request, 'places/geo_test.html', {})

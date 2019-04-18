@@ -24,6 +24,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('run/', include('rundezvous.urls')),
     path('chat/', include('chat.urls')),
+    path('places/', include('places.urls')),
 
     path('', run_views.home, name='home'),
 

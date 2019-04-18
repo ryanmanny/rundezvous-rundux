@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GEO Test</title>
+</head>
+<body>
+    <button role="button" onclick="getLocation();">Test to Press</button>
+</body>
+</html>
+
+<script>
+{# https://www.w3schools.com/html/html5_geolocation.asp #}
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+    } else {
+        alert("GPS not available");
+    }
+}
+
+function showPosition(position) {
+    alert("LAT " + position.coords.latitude + " LONG " + position.coords.longitude);
+}
+</script>
