@@ -9,7 +9,12 @@
     <script src="{% static 'js/jquery-3.3.1.js' %}"></script>
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'places/js/geo.js'%}"></script>
 
+    <script>
+        window.update_location_url = '{% url 'update_location' %}';
+        update_location();
+    </script>
     {% block header %}
     {% endblock %}
 </head>

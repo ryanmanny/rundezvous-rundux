@@ -47,6 +47,12 @@ class SiteUser(auth_models.AbstractUser):
         blank=True,
         on_delete=models.SET_NULL,
     )
+    location_updated_at = models.DateTimeField(
+        auto_now_add=timezone.now,
+        editable=True,
+        null=True,
+        blank=True,
+    )
 
     # RUNDEZVOUS DATA
     active_room = models.ForeignKey(  # User can only access one room at a time
@@ -74,15 +80,19 @@ class SiteUser(auth_models.AbstractUser):
         Called by the middleware to update user's location
         """
         self.location = new_location
+        self.location_updated_at = timezone.now()
+
+        self.save()
 
         # TODO: Maybe this should only happen on log in
-        self.update_region()
-        if self.region is None:
-            # User not in any supported region
-            raise place_models.SupportedRegion.UnsupportedRegionError
+        # self.update_region()
+        # if self.region is None:
+        #     # User not in any supported region
+        #     raise place_models.SupportedRegion.UnsupportedRegionError
 
-        if self.is_near_rundezvous:
-            self.handle_rundezvous_arrival()
+        if self.active_rundezvous is not None:
+            if self.is_near_rundezvous:
+                self.handle_rundezvous_arrival()
 
     def update_region(self):
         """
