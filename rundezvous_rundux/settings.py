@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    # Built-in apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -39,6 +40,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.gis',
 
+    # Third-party apps
+    'crispy_forms',
+
+    # Rundezvous Apps
     'rundezvous.apps.RundezvousConfig',
     'chat.apps.ChatConfig',
     'places.apps.WorldConfig',
@@ -137,3 +142,5 @@ AUTH_USER_MODEL = 'rundezvous.SiteUser'
 
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
+
+CRISPY_TEMPLATE_PACK = 'bootstrap3'
