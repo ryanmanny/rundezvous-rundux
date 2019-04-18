@@ -15,8 +15,11 @@
 </div>
 
 <script>
-    ajax_form('#message-submit', function(data) {
+    var container = $('#messages-container');
+
+    ajax_form('#message-form', function(data) {
         $('#messages-list').append(data);
+        container.scrollTop(container.prop("scrollHeight"));
     });
     check_for_messages();
 </script>
