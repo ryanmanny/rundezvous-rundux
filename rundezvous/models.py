@@ -72,7 +72,6 @@ class SiteUser(auth_models.AbstractUser):
     def update_location(self, new_location):
         """
         Called by the middleware to update user's location
-        TODO: Add to middleware
         """
         self.location = new_location
 
@@ -88,7 +87,6 @@ class SiteUser(auth_models.AbstractUser):
     def update_region(self):
         """
         Called by the middleware to update user's region
-        TODO: Add to middleware
         """
         try:
             region = place_models.SupportedRegion.objects.get(
