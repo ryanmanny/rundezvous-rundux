@@ -5,6 +5,7 @@ from django.contrib.auth import models as auth_models
 
 from django.utils import timezone
 from django.contrib.gis import measure
+from django.contrib.gis.db.models.functions import Distance
 
 from django.core.validators import MinValueValidator, MaxValueValidator
 
@@ -125,8 +126,13 @@ class SiteUser(auth_models.AbstractUser):
         """
         Returns True if user is within some distance of destination
         """
+        if self.active_rundezvous is None:
+            return
+
         distance = self.location.distance(
-            self.active_rundezvous.landmark.location)
+            self.active_rundezvous.landmark.location
+        )
+        # TODO: Figure out what units distance are in, it's probably meters
 
         return measure.Distance(m=distance) < const.MEETUP_DISTANCE_THRESHOLD
 
@@ -140,30 +146,38 @@ class SiteUser(auth_models.AbstractUser):
     def new_users(self):
         """
         Gets all users within current region who user has not met with yet
+        TODO: Exclude users who are not currently using the app
+        or maybe add some flag that denotes looking for partner
         """
         return SiteUser.objects.filter(
             region=self.region,
         ).exclude(
-            id=self,
-            id__not_in=self.met_users,  # Has everyone met themselves?
+            id=self.id,  # Has everyone met themselves?
+        ).exclude(
+            id__in=self.met_users.values_list('id', flat=True),
         )
 
     def get_new_users_within(self, miles):
         """
         Gets all users less than distance miles away from user
         """
-        distance = measure.Distance(mi=miles)
-
-        return self.new_users.distance(self.location).filter(
-            location__distance_lt=(self.location, distance),
-        )  # Annotates QuerySet with distance
+        return self.new_users.filter(
+            location__isnull=False,
+        ).filter(
+            location__distance_lte=(self.location, measure.D(mi=miles))
+        )
 
     @property
     def closest_new_user(self):
         """
         Gets closest new user to user
         """
-        return self.get_new_users_within(miles=2).first('distance')
+        return self.get_new_users_within(miles=2).annotate(
+            # TODO: Find a way to do this without being repetitive
+            distance=Distance('location', self.location)
+        ).order_by(
+            'distance'
+        ).first()
 
 
 class Rundezvous(models.Model):
