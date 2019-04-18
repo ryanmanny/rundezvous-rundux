@@ -1,42 +1,76 @@
+html, body {
+    width: 100%;
+    height: 100%;
+    font-family: Roboto, sans-serif;
+}
+
 .chatroom-wrapper {
-    width: 600px;
     position: absolute;
-    bottom: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.chatroom-header-container {
+    width: 100%;
+    height: 10%;
+    position: fixed;
+    top: 0;
+    background-color: #0069d9;
 }
 
 .chatroom-header {
-    margin: 0 auto;
-    width: 100px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.messages-wrapper {
-
+.messages-container {
+    position: fixed;
+    display: block;
+    overflow-y: scroll;
+    width: 100%;
+    height: 90%;
+    bottom: 0;
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
-.message-submit {
-    float: right;
+.messages-list {
+    padding-left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.message-form {
+    width: 100%;
     padding-bottom: 20px;
-}
-
-.message {
-    font-family: Roboto, sans-serif;
 }
 
 .message-box {
     display: inline-block;
     padding: 5px;
     border-radius: 5px;
-    margin-bottom: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 .message-box-left {
     margin-right: 100%;
     float: left;
-    background-color: gray;
+    background-color: lightgray;
 }
 
 .message-box-right {
     margin-left: 100%;
     float: right;
-    background-color: blue;
+    background-color: lightblue;
+}
+
+.message-text-input {
+    width: 90% !important;
+}
+
+.message-text-button {
+    width: 10% !important;
 }

@@ -1,0 +1,5 @@
+<form class="message-form form-inline" id="message-form" method="POST" action="{% url 'send_message' %}">
+    {% csrf_token %}
+    <input type="text" class="message-text-input form-control" id="message-text-input" name="text" maxlength="{{ max_length }}">
+    <button type="submit" class="message-text-button btn">⮚</button>
+</form>

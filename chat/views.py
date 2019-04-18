@@ -8,7 +8,7 @@ from django.http import (
 )
 
 from chat import models
-from chat import forms
+from chat import const
 
 
 @login_required
@@ -28,10 +28,9 @@ def chatroom(request):
         request,
         'chat/chatroom.html',
         {
-            'form': forms.TextForm,
             'user': user,
             'room': room,
-            'room_name': room.name,
+            'max_message_len': const.MAX_MESSAGE_LENGTH,
         },
     )
 

@@ -1,5 +1,0 @@
-<form class="message-submit" id="message-submit" method="POST" action="{% url 'send_message' %}">
-    {% csrf_token %}
-    {{ form }}
-    <button type="submit">Send</button>
-</form>
