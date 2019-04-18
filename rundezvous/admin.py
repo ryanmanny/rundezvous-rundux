@@ -2,27 +2,46 @@
 Defines sensible admin panel for Rundezvous app
 """
 
-from django.contrib import admin
+from django.contrib.gis import admin
 
 from rundezvous import models
 
 
 @admin.register(models.SiteUser)
-class SiteUserAdmin(admin.ModelAdmin):
+class SiteUserAdmin(admin.GeoModelAdmin):  # TODO: Change to OSM?
     """
     SiteUser Admin page
     Organizes fields into three sections based on logical partitions of a user
     """
     model = models.SiteUser
 
+    # These fields must be specified here to use them in fieldsets
+    readonly_fields = ('location_updated_at', 'latitude', 'longitude')
+
     fieldsets = [
         ('User', {
-            'fields': ('username', 'email', 'is_superuser', 'is_staff', 'is_active',),
+            'fields': (
+                'username',
+                'email',
+                'is_superuser',
+                'is_staff',
+                'is_active',
+            ),
         }),
         ('Profile', {
-            'fields': ('display_name', 'active_room', 'reputation',),
+            'fields': (
+                'display_name',
+                'active_room',
+                'reputation',
+            ),
         }),
         ('Location', {
-            'fields': ('location', 'region',),
+            'fields': (
+                'location',
+                'latitude',
+                'longitude',
+                'region',
+                'location_updated_at',
+            ),
         }),
     ]

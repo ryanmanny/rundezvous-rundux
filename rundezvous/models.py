@@ -75,6 +75,14 @@ class SiteUser(auth_models.AbstractUser):
     def __str__(self):
         return f"{self._meta.verbose_name} <{self.display_name if self.display_name else 'NONE'} - {self.email}>"
 
+    @property
+    def latitude(self):
+        return self.location.y
+
+    @property
+    def longitude(self):
+        return self.location.x
+
     def update_location(self, new_location):
         """
         Called by the middleware to update user's location
