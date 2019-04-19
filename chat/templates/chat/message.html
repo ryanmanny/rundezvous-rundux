@@ -1,10 +1,10 @@
 {% if user == message.sent_by %}
 {# Display your own messages on the right-hand side #}
-<li class="message-box message-box-right">
-    <span class="message" id="message{{ message.id }}" data-message-id="{{ message.id }}">{{ message.text }}</span>
+<li class="message-box message-box-right" id="message_box{{ message.id }}">
+    <div class="message" id="message{{ message.id }}" data-message-id="{{ message.id }}">{{ message.text }}</div>
 </li>
 {% else %}
-<li class="message-box message-box-left">
-    <span class="message" id="message{{ message.id }}" data-message-id="{{ message.id }}">{{ message.text }}</span>
+<li class="message-box message-box-left" id="message_box{{ message.id }}">
+    <div class="message" id="message{{ message.id }}" data-message-id="{{ message.id }}">{{ message.text }}</div>
 </li>
 {% endif %}
