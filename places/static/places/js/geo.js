@@ -1,10 +1,10 @@
-function update_location() {
+function update_location(url) {
     const timeout = 30000;  // 30 seconds
 
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
             $.post({
-                url: window.update_location_url,
+                url: url,
                 data: {
                     lat: position.coords.latitude,
                     long: position.coords.longitude

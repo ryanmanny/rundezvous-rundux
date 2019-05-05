@@ -12,8 +12,7 @@
     <script src="{% static 'places/js/geo.js'%}"></script>
 
     <script>
-        window.update_location_url = '{% url 'update_location' %}';
-        update_location();
+        update_location('{% url 'update_location' %}');
     </script>
     {% block header %}
     {% endblock %}
