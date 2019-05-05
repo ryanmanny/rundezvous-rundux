@@ -9,6 +9,7 @@ function ajax_form(selector, callback)
             data: form.serialize(),
             success: function (data) {
                 if (callback !== undefined) {
+                    // TODO: I don't think this check is JavaScriptic
                     callback(data);
                 }
             }
@@ -30,6 +31,7 @@ function load_message(id)
 
 function check_for_messages(timeout)
 {
+    // TODO: Use long polling, channels / RabbitMQ, etc. something besides polling
     if (timeout === undefined)
         timeout = 1000;  // One second by default
 
