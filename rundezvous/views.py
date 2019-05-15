@@ -25,4 +25,4 @@ def signup(request):
     else:
         form = forms.SignupForm()
 
-    return render(request, 'rundezvous/registration/signup.html', {'form': form})
+    return render(request, 'registration/signup.html', {'form': form})
