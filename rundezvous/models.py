@@ -30,6 +30,14 @@ class SiteUser(auth_models.AbstractUser):
         null=True,
         blank=True,
     )
+    gender = models.CharField(
+        max_length=1,
+        choices=[
+            ('M', 'Male'),
+            ('F', 'Female'),
+            ('O', 'Other'),
+        ],
+    )
     # display_color TODO: Import django-colorpicker
     reputation = models.IntegerField(
         default=0,
@@ -106,6 +114,7 @@ class SiteUser(auth_models.AbstractUser):
     def update_region(self):
         """
         Called by the middleware to update user's region
+        Uses User.location to automatically detect region
         """
         try:
             region = place_models.SupportedRegion.objects.get(
@@ -178,6 +187,27 @@ class SiteUser(auth_models.AbstractUser):
         ).order_by(
             'distance'
         ).first()
+
+
+class Preferences(models.Model):
+    class Meta:
+        verbose_name = 'preferences'
+        verbose_name_plural = 'preferences'
+
+    user = models.OneToOneField(
+        SiteUser,
+        primary_key=True,
+        on_delete=models.CASCADE,
+    )
+
+    # GENDER PREFERENCES - Compared against User.gender
+    males = models.BooleanField(default=False)
+    females = models.BooleanField(default=False)
+    others = models.BooleanField(default=False)
+
+    # ACTIVITY PREFERENCES - Compared against other User.profiles
+    hookups = models.BooleanField(default=False)
+    # TODO: Add some less obvious ones
 
 
 class Rundezvous(models.Model):
