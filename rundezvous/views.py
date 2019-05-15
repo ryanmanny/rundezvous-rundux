@@ -7,7 +7,7 @@ from rundezvous import forms
 def home(request):
     user = request.user
 
-    return render(request, 'home.html', {'user': user})
+    return render(request, 'rundezvous/home.html', {'user': user})
 
 
 def signup(request):
@@ -25,4 +25,4 @@ def signup(request):
     else:
         form = forms.SignupForm()
 
-    return render(request, 'registration/signup.html', {'form': form})
+    return render(request, 'rundezvous/registration/signup.html', {'form': form})
