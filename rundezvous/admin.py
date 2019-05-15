@@ -31,7 +31,7 @@ class SiteUserAdmin(admin.GeoModelAdmin):  # TODO: Change to OSM?
         ('Profile', {
             'fields': (
                 'display_name',
-                'active_room',
+                'gender',
                 'reputation',
             ),
         }),
@@ -43,5 +43,12 @@ class SiteUserAdmin(admin.GeoModelAdmin):  # TODO: Change to OSM?
                 'region',
                 'location_updated_at',
             ),
+        }),
+        ('Rundezvous', {
+           'fields': (
+               'active_room',
+               'active_rundezvous',
+               'met_users',
+           ),
         }),
     ]
