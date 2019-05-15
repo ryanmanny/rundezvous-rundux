@@ -215,6 +215,10 @@ class Rundezvous(models.Model):
     """
     The titular unit of data, describes the meetup between two+ users
     """
+    class Meta:
+        verbose_name = 'rundezvous'
+        verbose_name_plural = 'rundezvouses'  # (nonstandard, rare)
+
     objects = managers.RundezvousManager.\
         from_queryset(managers.RundezvousSet)
     unexpired = managers.RundezvousUnexpiredManager.\
