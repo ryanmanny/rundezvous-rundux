@@ -7,8 +7,27 @@ from django.contrib.gis import admin
 from rundezvous import models
 
 
+class PreferencesInline(admin.StackedInline):
+    model = models.Preferences
+
+    fieldsets = [
+        ('Gender', {
+            'fields': (
+                'males',
+                'females',
+                'others',
+            ),
+        }),
+        ('Activities', {
+            'fields': (
+                'hookups',
+            ),
+        }),
+    ]
+
+
 @admin.register(models.SiteUser)
-class SiteUserAdmin(admin.GeoModelAdmin):  # TODO: Change to OSM?
+class SiteUserAdmin(admin.GeoModelAdmin):  # TODO: Change to OSMModelAdmin?
     """
     SiteUser Admin page
     Organizes fields into three sections based on logical partitions of a user
@@ -52,3 +71,10 @@ class SiteUserAdmin(admin.GeoModelAdmin):  # TODO: Change to OSM?
            ),
         }),
     ]
+
+    inlines = (PreferencesInline,)
+
+
+@admin.register(models.Rundezvous)
+class RundezvousAdmin(admin.ModelAdmin):
+    pass
