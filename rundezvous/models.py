@@ -79,6 +79,7 @@ class SiteUser(auth_models.AbstractUser):
     met_users = models.ManyToManyField(
         'self',
         symmetrical=True,  # If I've met you, you've met me
+        blank=True,
     )
 
     def __str__(self):
