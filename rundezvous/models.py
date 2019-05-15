@@ -234,6 +234,9 @@ class Rundezvous(models.Model):
         ]
     )
 
+    def __str__(self):
+        return f"{self._meta.verbose_name} <{self.siteuser_set} meeting at {self.landmark}>"
+
     @property
     def time_elapsed(self) -> datetime.timedelta:
         return timezone.now() - self.created_at
