@@ -239,9 +239,9 @@ class Rundezvous(models.Model):
         verbose_name_plural = 'rundezvouses'  # (nonstandard, rare)
 
     objects = managers.RundezvousManager.\
-        from_queryset(managers.RundezvousSet)
+        from_queryset(managers.RundezvousSet)()
     unexpired = managers.RundezvousUnexpiredManager.\
-        from_queryset(managers.RundezvousSet)
+        from_queryset(managers.RundezvousSet)()
 
     created_at = models.DateTimeField(  # Used to time out users
         auto_now_add=True,
