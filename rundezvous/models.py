@@ -3,10 +3,10 @@ import datetime
 from django.contrib.gis.db import models as models
 from django.contrib.auth import models as auth_models
 
+from django.contrib.gis.db.models import Subquery
+
 from django.utils import timezone
 from django.contrib.gis import measure
-from django.contrib.gis.db.models import Subquery
-from django.contrib.gis.db.models.functions import Distance
 
 from django.core.validators import MinValueValidator, MaxValueValidator
 
@@ -18,59 +18,8 @@ from rundezvous import const
 from rundezvous import managers
 
 
-class SiteUserManager(models.Manager):
-    def active(self):
-        return super().get_queryset().active()
-
-
-class SiteUserSet(models.QuerySet):
-    def active(self):
-        user_active_time = timezone.now() - const.USER_ACTIVE_TIME
-
-        return self.filter(
-            location_updated_at__gte=user_active_time,
-        )
-
-    def havent_met(self, user):
-        """
-        Gets all users within current region who user has not met with yet
-        """
-        met_users = user.met_users.values_list('id', flat=True)  # Symmetrical
-
-        return self.filter(
-            region=user.region,
-        ).exclude(
-            id=user.id,  # Has everyone met themselves?
-        ).exclude(  # CHAIN, don't combine
-            id__in=Subquery(met_users),
-        )
-
-    def order_by_closest_to(self, user):
-        """
-        Gets closest compatible user to current user
-        """
-        return self.annotate(
-            distance=Distance('location', user.location),
-        ).order_by(
-            'distance',
-        ).first()
-
-    def meetable_users_within(self, user, miles):
-        """
-        Gets all users less than distance miles away from user
-        """
-        return self.active().havent_met(
-            user,
-        ).filter(
-            location__distance_lte=(user.location, measure.D(mi=miles)),
-            looking_for_rundezvous=True,
-        ).order_by_closest_to(
-            user,
-        )
-
-
 class SiteUser(auth_models.AbstractUser):
-    objects = SiteUserManager.from_queryset(SiteUserSet)()
+    objects = managers.SiteUserManager.from_queryset(managers.SiteUserSet)()
 
     email = models.EmailField(  # Overrides email field of AbstractUser
         unique=True,
