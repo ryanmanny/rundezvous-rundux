@@ -5,6 +5,7 @@ from django.contrib.auth import models as auth_models
 
 from django.utils import timezone
 from django.contrib.gis import measure
+from django.contrib.gis.db.models import Subquery
 from django.contrib.gis.db.models.functions import Distance
 
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -17,7 +18,60 @@ from rundezvous import const
 from rundezvous import managers
 
 
+class SiteUserManager(models.Manager):
+    def active(self):
+        return super().get_queryset().active()
+
+
+class SiteUserSet(models.QuerySet):
+    def active(self):
+        user_active_time = timezone.now() - const.USER_ACTIVE_TIME
+
+        return self.filter(
+            location_updated_at__gte=user_active_time,
+        )
+
+    def havent_met(self, user):
+        """
+        Gets all users within current region who user has not met with yet
+        """
+        met_users = user.met_users.values_list('id', flat=True)  # Symmetrical
+
+        return self.filter(
+            region=user.region,
+        ).exclude(
+            id=user.id,  # Has everyone met themselves?
+        ).exclude(  # CHAIN, don't combine
+            id__in=Subquery(met_users),
+        )
+
+    def order_by_closest_to(self, user):
+        """
+        Gets closest compatible user to current user
+        """
+        return self.annotate(
+            distance=Distance('location', user.location),
+        ).order_by(
+            'distance',
+        ).first()
+
+    def meetable_users_within(self, user, miles):
+        """
+        Gets all users less than distance miles away from user
+        """
+        return self.active().havent_met(
+            user,
+        ).filter(
+            location__distance_lte=(user.location, measure.D(mi=miles)),
+            looking_for_rundezvous=True,
+        ).order_by_closest_to(
+            user,
+        )
+
+
 class SiteUser(auth_models.AbstractUser):
+    objects = SiteUserManager.from_queryset(SiteUserSet)()
+
     email = models.EmailField(  # Overrides email field of AbstractUser
         unique=True,
         null=False,
@@ -61,9 +115,11 @@ class SiteUser(auth_models.AbstractUser):
         editable=True,
         null=True,
         blank=True,
+        db_index=True,  # To get active users quickly
     )
 
     # RUNDEZVOUS DATA
+    looking_for_rundezvous = models.BooleanField(default=False)
     active_room = models.ForeignKey(  # User can only access one room at a time
         chat_models.ChatRoom,
         null=True,  # User can exist without room
@@ -151,43 +207,6 @@ class SiteUser(auth_models.AbstractUser):
         TODO: Make this an event or something like that?
         """
         raise NotImplementedError
-
-    @property
-    def new_users(self):
-        """
-        Gets all users within current region who user has not met with yet
-        TODO: Exclude users who are not currently using the app
-        or maybe add some flag that denotes looking for partner
-        """
-        return SiteUser.objects.filter(
-            region=self.region,
-        ).exclude(
-            id=self.id,  # Has everyone met themselves?
-        ).exclude(
-            id__in=self.met_users.values_list('id', flat=True),
-        )
-
-    def get_new_users_within(self, miles):
-        """
-        Gets all users less than distance miles away from user
-        """
-        return self.new_users.filter(
-            location__isnull=False,
-        ).filter(
-            location__distance_lte=(self.location, measure.D(mi=miles))
-        )
-
-    @property
-    def closest_new_user(self):
-        """
-        Gets closest new user to user
-        """
-        return self.get_new_users_within(miles=2).annotate(
-            # TODO: Find a way to do this without being repetitive
-            distance=Distance('location', self.location)
-        ).order_by(
-            'distance'
-        ).first()
 
 
 class Preferences(models.Model):
