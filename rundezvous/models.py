@@ -68,7 +68,20 @@ class SiteUser(auth_models.AbstractUser):
     )
 
     # RUNDEZVOUS DATA
-    looking_for_rundezvous = models.BooleanField(default=False)
+    NONE = 'N'
+    LOOKING = 'L'
+    RUNNING = 'R'
+    REVIEW = 'V'
+
+    rundezvous_status = models.CharField(
+        max_length=1,
+        choices=[
+            (NONE, 'None'),
+            (LOOKING, 'Looking'),
+            (RUNNING, 'Running'),
+            (REVIEW, 'Review'),
+        ]
+    )
     active_room = models.ForeignKey(  # User can only access one room at a time
         chat_models.ChatRoom,
         null=True,  # User can exist without room
@@ -113,9 +126,8 @@ class SiteUser(auth_models.AbstractUser):
         #     # User not in any supported region
         #     raise place_models.SupportedRegion.UnsupportedRegionError
 
-        if self.active_rundezvous is not None:
-            if self.is_near_rundezvous:
-                self.handle_rundezvous_arrival()
+        if self.check_rundezvous_arrived():
+            self.handle_rundezvous_arrival()
 
     def update_region(self):
         """
@@ -136,26 +148,31 @@ class SiteUser(auth_models.AbstractUser):
 
         self.save()
 
-    @property
-    def is_near_rundezvous(self):
+    def check_rundezvous_arrived(self):
         """
-        Returns True if user is within some distance of destination
+        Returns True if User made it to Rundezvous destination
         """
         if self.active_rundezvous is None:
-            return
+            return None
 
-        distance = self.location.distance(
-            self.active_rundezvous.landmark.location
-        )
+        rundezvous_location = self.active_rundezvous.landmark.location
+        distance = self.location.distance(rundezvous_location)
         # TODO: Figure out what units distance are in, it's probably meters
 
-        return measure.Distance(m=distance) < const.MEETUP_DISTANCE_THRESHOLD
+        return measure.D(m=distance) < const.MEETUP_DISTANCE_THRESHOLD
 
     def handle_rundezvous_arrival(self):
         """
-        TODO: Make this an event or something like that?
+        Should be used as a callback on location update
         """
-        raise NotImplementedError
+        self.rundezvous_status = self.REVIEW
+        self.save()
+
+        active_rundezvous = self.active_rundezvous
+
+        # This will get overwritten if the next person made it
+        active_rundezvous.ended_at = timezone.now()
+        active_rundezvous.save()
 
 
 class Preferences(models.Model):
@@ -179,6 +196,60 @@ class Preferences(models.Model):
     # TODO: Add some less obvious ones
 
 
+class Review(models.Model):
+    """
+    A review must be written for the other user after every Rundezvous
+    """
+    reviewer = models.ForeignKey(
+        SiteUser,
+        related_name='reviews',
+        on_delete=models.CASCADE,
+    )
+    reviewed = models.ForeignKey(
+        SiteUser,
+        related_name='reviews_for',
+        on_delete=models.CASCADE,
+    )
+
+    showed_up = models.BooleanField(
+        null=True,
+        blank=True,
+        default=None,
+    )
+
+
+
+class RundezvousLog(models.Model):
+    """
+    Logs what happened on a completed Rundezvous
+    """
+    SUCCESSFUL = 'S'
+    FAILED = 'F'
+    EXPIRED = 'E'
+
+    status = models.CharField(
+        max_length=1,
+        choices=[
+            (SUCCESSFUL, 'Successful'),
+            (FAILED, 'Failed'),
+            (EXPIRED, 'Expired'),
+        ],
+    )
+
+    started = models.DateTimeField()
+    ended = models.DateTimeField(
+        null=True,  # Null when the Rundezvous expired
+        blank=True,
+    )
+
+    chat_room = models.ForeignKey(
+        chat_models.ChatRoom,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+
+
 class Rundezvous(models.Model):
     """
     The titular unit of data, describes the meetup between two+ users
@@ -187,13 +258,15 @@ class Rundezvous(models.Model):
         verbose_name = 'rundezvous'
         verbose_name_plural = 'rundezvouses'  # (nonstandard, rare)
 
-    objects = managers.RundezvousManager.\
-        from_queryset(managers.RundezvousSet)()
-    unexpired = managers.RundezvousUnexpiredManager.\
-        from_queryset(managers.RundezvousSet)()
+    objects = managers.RundezvousManager.from_queryset(managers.RundezvousSet)()
 
     created_at = models.DateTimeField(  # Used to time out users
         auto_now_add=True,
+    )
+    ended_at = models.DateTimeField(
+        default=None,
+        null=True,
+        blank=True,
     )
     landmark = models.ForeignKey(
         place_models.Landmark,
@@ -220,5 +293,27 @@ class Rundezvous(models.Model):
         )
 
     @property
+    def expiration_datetime(self) -> datetime.datetime:
+        return self.created_at + datetime.timedelta(
+            seconds=self.expiration_seconds,
+        )
+
+    @property
     def is_expired(self):
         return self.time_left < datetime.timedelta(seconds=0)
+
+    def clean_up(self, status=RundezvousLog.EXPIRED):
+        """
+        The function is called when a Rundezvous is finished
+        """
+        users = self.siteuser_set.all()
+
+        RundezvousLog.objects.create(
+            status=status,
+            started=self.created_at,
+            stopped=self.ended_at or self.expiration_datetime,
+            users=Subquery(users),
+            chat_room=users.first().active_room,  # Assume it was the same
+        )
+
+        self.delete()
