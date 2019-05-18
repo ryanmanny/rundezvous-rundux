@@ -242,7 +242,7 @@ class RundezvousLog(models.Model):
         blank=True,
     )
 
-    chat_room = models.ForeignKey(
+    chatroom = models.ForeignKey(
         chat_models.ChatRoom,
         null=True,
         blank=True,
@@ -267,6 +267,11 @@ class Rundezvous(models.Model):
         default=None,
         null=True,
         blank=True,
+    )
+
+    chatroom = models.ForeignKey(
+        chat_models.ChatRoom,
+        on_delete=models.CASCADE,  # This missing would be messy
     )
     landmark = models.ForeignKey(
         place_models.Landmark,
