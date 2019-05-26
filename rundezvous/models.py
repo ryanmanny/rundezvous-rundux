@@ -1,5 +1,3 @@
-import datetime
-
 from django.contrib.gis.db import models as models
 from django.contrib.auth import models as auth_models
 
@@ -235,7 +233,7 @@ class Rundezvous(models.Model):
 
     objects = managers.RundezvousManager()
 
-    created_at = models.DateTimeField(  # Used to time out users
+    started_at = models.DateTimeField(  # Used to time out users
         auto_now_add=True,
     )
     ended_at = models.DateTimeField(
@@ -259,24 +257,17 @@ class Rundezvous(models.Model):
         return f"{self._meta.verbose_name} <{self.users} meeting at {self.landmark}>"
 
     @property
-    def time_elapsed(self) -> datetime.timedelta:
-        return timezone.now() - self.created_at
+    def expires_at(self) -> timezone.datetime:
+        return self.started_at + timezone.timedelta(seconds=self.expiration_seconds)
 
     @property
-    def time_left(self) -> datetime.timedelta:
-        return datetime.timedelta(
-            seconds=self.expiration_seconds - self.time_elapsed.seconds,
-        )
-
-    @property
-    def expiration_datetime(self) -> datetime.datetime:
-        return self.created_at + datetime.timedelta(
-            seconds=self.expiration_seconds,
-        )
+    def seconds_left(self) -> int:
+        return int((self.expires_at - timezone.now()).total_seconds())
 
     @property
     def is_expired(self):
-        return self.time_left < datetime.timedelta(seconds=0)
+        # TODO: -> NullBoolean property pseudo-field since these can't UNexpire?
+        return self.seconds_left < 0
 
 
 class UserToRundezvous(models.Model):

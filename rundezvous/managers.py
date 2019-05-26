@@ -79,31 +79,24 @@ class SiteUserManager(auth_models.UserManager.from_queryset(SiteUserSet)):
 
 # Rundezvous
 class RundezvousSet(models.QuerySet):
-    def add_time_left(self):
+    def add_expires_at(self):
         """
-        Annotates time left in seconds on Query
+        Annotates QuerySet with expires_at datetime by using created_at and
+        TODO: Stop supporting Spatialite so I can use this
         """
-        now = timezone.now()
-        return self.filter(
-            created_at__gt=now - const.MAX_RUNDEZVOUS_EXPIRATION,
-        ).annotate(
-            time_left=now - F('created_at') - F('expiration_seconds'),
-        )
+        raise NotImplementedError
 
-    def expired(self):
-        return self.filter(
-            time_left__gt=0,
-        )
-
-    def unexpired(self):
-        return self.filter(
-            time_left__lte=0,
-        )
+        # return self.annotate(
+        #     expires_at=ExpressionWrapper(
+        #         F('created_at') + F('expiration_seconds') * timezone.timedelta(seconds=1),
+        #         output_field=DateTimeField(),
+        #     )
+        # )
 
 
 class RundezvousManager(models.Manager.from_queryset(RundezvousSet)):
     def expired(self):
-        return self.get_queryset().expired()
+        raise NotImplementedError
 
     def unexpired(self):
-        return self.get_queryset().unexpired()
+        raise NotImplementedError
