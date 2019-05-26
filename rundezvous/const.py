@@ -12,3 +12,5 @@ CHAT_TIME_LIMIT = datetime.timedelta(minutes=2)
 
 # The maximum distance between two users where a meetup can still be created
 MEETUP_DISTANCE_THRESHOLD = Distance(m=100)
+
+MAX_CHAT_MESSAGE_LENGTH = 140

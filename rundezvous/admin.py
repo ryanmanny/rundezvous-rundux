@@ -7,32 +7,6 @@ from django.contrib.gis import admin
 from rundezvous import models
 
 
-class PreferencesInline(admin.TabularInline):
-    model = models.Preferences
-
-    fieldsets = [
-        ('Gender', {
-            'fields': (
-                'males',
-                'females',
-                'others',
-            ),
-        }),
-        ('Activities', {
-            'fields': (
-                'hookups',
-            ),
-        }),
-    ]
-
-
-class MetUsersInline(admin.TabularInline):
-    model = models.Review
-    fk_name = 'reviewer'
-
-    extra = 0
-
-
 @admin.register(models.SiteUser)
 class SiteUserAdmin(admin.GeoModelAdmin):  # TODO: Change to OSMModelAdmin?
     """
@@ -82,9 +56,38 @@ class SiteUserAdmin(admin.GeoModelAdmin):  # TODO: Change to OSMModelAdmin?
         }),
     ]
 
+    class PreferencesInline(admin.TabularInline):
+        model = models.Preferences
+
+        fieldsets = [
+            ('Gender', {
+                'fields': (
+                    'males',
+                    'females',
+                    'others',
+                ),
+            }),
+            ('Activities', {
+                'fields': (
+                    'hookups',
+                ),
+            }),
+        ]
+
+    class MetUsersInline(admin.TabularInline):
+        model = models.Review
+        fk_name = 'reviewer'
+
+        extra = 0
+
     inlines = (PreferencesInline, MetUsersInline)
 
 
 @admin.register(models.Rundezvous)
 class RundezvousAdmin(admin.ModelAdmin):
-    pass
+    class ChatMessageInline(admin.TabularInline):
+        model = models.ChatMessage
+
+        extra = 1
+
+    inlines = [ChatMessageInline]

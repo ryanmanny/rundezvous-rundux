@@ -1,3 +1,4 @@
+// TODO: Remove this in favor of Django Channels
 function ajax_form(selector, callback)
 {
     let form = $(selector);

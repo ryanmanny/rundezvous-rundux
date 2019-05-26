@@ -9,7 +9,6 @@ from django.contrib.gis import measure
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 # Rundezvous depends on Chat, Places apps
-from chat import models as chat_models
 from places import models as place_models
 
 from rundezvous import const
@@ -245,10 +244,6 @@ class Rundezvous(models.Model):
         blank=True,
     )
 
-    chatroom = models.OneToOneField(
-        chat_models.ChatRoom,
-        on_delete=models.CASCADE,  # This missing would be messy
-    )
     landmark = models.ForeignKey(
         place_models.Landmark,
         on_delete=models.CASCADE,  # Meetup needs a location
@@ -301,3 +296,30 @@ class UserToRundezvous(models.Model):
     is_active = models.BooleanField(
         default=True,
     )
+
+
+class ChatMessage(models.Model):
+    """
+    Abstract ChatMessage, associated with a ChatRoom
+    """
+    class Meta:
+        ordering = ('sent_at',)  # TODO: This might be unnecessary because sent_at should correlated with id
+
+    room = models.ForeignKey(
+        Rundezvous,
+        on_delete=models.CASCADE,  # Message can't exist without room
+        related_name='messages',
+    )
+    text = models.CharField(
+        max_length=const.MAX_CHAT_MESSAGE_LENGTH,  # Twitter knew what they were doing I guess
+    )
+    sent_by = models.ForeignKey(
+        SiteUser,
+        on_delete=models.CASCADE,  # Message can't exist without user
+    )
+    sent_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    def __str__(self):
+        return f"{self._meta.verbose_name} <{self.sent_by} - {self.text}>"
