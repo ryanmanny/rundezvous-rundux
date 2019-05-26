@@ -92,7 +92,7 @@ class SiteUser(auth_models.AbstractUser):
     )
 
     def __str__(self):
-        return f"{self._meta.verbose_name} <{self.display_name if self.display_name else 'NONE'} - {self.email}>"
+        return f"{self.display_name if self.display_name else 'NONE'} - {self.email}"
 
     @property
     def latitude(self):
@@ -254,7 +254,7 @@ class Rundezvous(models.Model):
     )
 
     def __str__(self):
-        return f"{self._meta.verbose_name} <{self.users} meeting at {self.landmark}>"
+        return f"{self.users} meeting at {self.landmark}"
 
     @property
     def expires_at(self) -> timezone.datetime:
@@ -313,4 +313,4 @@ class ChatMessage(models.Model):
     )
 
     def __str__(self):
-        return f"{self._meta.verbose_name} <{self.sent_by} - {self.text}>"
+        return f"{self.sent_by} - {self.text}"
