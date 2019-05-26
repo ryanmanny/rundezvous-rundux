@@ -1,8 +1,8 @@
 from django.contrib.gis.db import models
-from django.contrib.gis.db.models import F
+from django.contrib.auth import models as auth_models
+from django.contrib.gis.db.models import F, Subquery
 
 from django.contrib.gis import measure
-from django.contrib.gis.db.models import Subquery
 
 from django.contrib.gis.geos import Point
 # https://docs.djangoproject.com/en/2.1/ref/contrib/gis/functions
@@ -16,11 +16,6 @@ from rundezvous import const
 
 
 # SiteUser
-class SiteUserManager(models.Manager):
-    def active(self):
-        return self.get_queryset().active()
-
-
 class SiteUserSet(models.QuerySet):
     def get_midpoint(self) -> Point:
         """
@@ -77,15 +72,12 @@ class SiteUserSet(models.QuerySet):
         )
 
 
+class SiteUserManager(auth_models.UserManager.from_queryset(SiteUserSet)):
+    def active(self):
+        return self.get_queryset().active()
+
+
 # Rundezvous
-class RundezvousManager(models.Manager):
-    def expired(self):
-        return self.get_queryset().expired()
-
-    def unexpired(self):
-        return self.get_queryset().unexpired()
-
-
 class RundezvousSet(models.QuerySet):
     def add_time_left(self):
         """
@@ -107,3 +99,11 @@ class RundezvousSet(models.QuerySet):
         return self.filter(
             time_left__lte=0,
         )
+
+
+class RundezvousManager(models.Manager.from_queryset(RundezvousSet)):
+    def expired(self):
+        return self.get_queryset().expired()
+
+    def unexpired(self):
+        return self.get_queryset().unexpired()

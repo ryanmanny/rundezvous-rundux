@@ -19,7 +19,7 @@ from rundezvous import managers
 
 
 class SiteUser(auth_models.AbstractUser):
-    objects = managers.SiteUserManager.from_queryset(managers.SiteUserSet)()
+    objects = managers.SiteUserManager()
 
     email = models.EmailField(  # Overrides email field of AbstractUser
         unique=True,
@@ -218,7 +218,6 @@ class Review(models.Model):
     )
 
 
-
 class RundezvousLog(models.Model):
     """
     Logs what happened on a completed Rundezvous
@@ -258,7 +257,7 @@ class Rundezvous(models.Model):
         verbose_name = 'rundezvous'
         verbose_name_plural = 'rundezvouses'  # (nonstandard, rare)
 
-    objects = managers.RundezvousManager.from_queryset(managers.RundezvousSet)()
+    objects = managers.RundezvousManager()
 
     created_at = models.DateTimeField(  # Used to time out users
         auto_now_add=True,
