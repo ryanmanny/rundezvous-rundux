@@ -77,7 +77,7 @@ def chatroom(request):
         {
             'user': user,
             'room': room,
-            'max_message_len': chat_const.MAX_MESSAGE_LENGTH,
+            'max_message_len': const.MAX_CHAT_MESSAGE_LENGTH,
             'time_limit': const.CHAT_TIME_LIMIT,
         },
     )
@@ -110,7 +110,7 @@ def chatroom(request):
 
     return render(
         request,
-        'chat/templates/rundezvous/chatroom.html',
+        'rundezvous/chatroom.html',
         {
             'user': user,
             'room': room,
@@ -169,7 +169,7 @@ def message(request, message_id=None):
 
     return render(
         request,
-        'chat/templates/rundezvous/message.html',
+        'rundezvous/message.html',
         {
             'message': message,
             'user': user,
