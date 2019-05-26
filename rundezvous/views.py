@@ -45,14 +45,14 @@ def waiting_room(request):
     try:
         rundezvous = user.find_rundezvous()
     except models.Rundezvous.DoesNotExist:
-        user.rundezvous_status = models.SiteUser.LOOKING
+        user.rundezvous_status = models.SiteUser.Status.LOOKING
         user.save()
         return render(request, 'rundezvous/waiting_room.html', {})
     else:
         # TODO: Refactor into method
         user.active_rundezvous = rundezvous
         user.active_room = rundezvous.chatroom
-        user.rundezvous_status = models.SiteUser.RUNNING
+        user.rundezvous_status = models.SiteUser.Status.RUNNING
         user.save()
 
         return redirect(reverse('active_rundezvous'))

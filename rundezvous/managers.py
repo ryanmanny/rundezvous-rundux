@@ -71,7 +71,7 @@ class SiteUserSet(models.QuerySet):
             user,
         ).filter(
             location__distance_lte=(user.location, distance),
-            rundezvous_status=SiteUser.LOOKING,
+            rundezvous_status=SiteUser.Status.LOOKING,
         ).order_by_closest_to(
             user,
         )

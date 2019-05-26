@@ -63,20 +63,23 @@ class SiteUser(auth_models.AbstractUser):
     )
 
     # RUNDEZVOUS DATA
-    NONE = 'N'
-    LOOKING = 'L'
-    RUNNING = 'R'
-    REVIEW = 'V'
+    class Status:
+        NONE = 'N'
+        LOOKING = 'L'
+        RUNNING = 'R'
+        REVIEW = 'V'
 
-    rundezvous_status = models.CharField(
+    status = models.CharField(
+        # This field is used to filter users based on what they're doing
+        # TODO: Formalize this into the State Pattern?
         max_length=1,
         choices=[
-            (NONE, 'None'),
-            (LOOKING, 'Looking'),
-            (RUNNING, 'Running'),
-            (REVIEW, 'Review'),
+            (Status.NONE, 'None'),
+            (Status.LOOKING, 'Looking'),
+            (Status.RUNNING, 'Running'),
+            (Status.REVIEW, 'Review'),
         ],
-        default=NONE,
+        default=Status.NONE,
     )
     rundezvouses = models.ManyToManyField(
         'Rundezvous',
@@ -167,7 +170,7 @@ class SiteUser(auth_models.AbstractUser):
         """
         Should be used as a callback on location update
         """
-        self.rundezvous_status = self.REVIEW
+        self.status = self.Status.REVIEW
         self.save()
 
         active_rundezvous = self.active_rundezvous
