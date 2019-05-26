@@ -18,8 +18,10 @@ class ChatRoom(models.Model):
         """
         Joins names of all participants in room together
         """
-        if self.siteuser_set.exists():
-            return ", ".join(user.display_name or "?" for user in self.siteuser_set.all())
+        if self.rundezvous.users.exists():
+            return ", ".join(
+                user.display_name or '?' for user in self.rundezvous.users.all()
+            )
         else:
             return "Empty room"
 

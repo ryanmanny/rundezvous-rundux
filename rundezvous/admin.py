@@ -7,7 +7,7 @@ from django.contrib.gis import admin
 from rundezvous import models
 
 
-class PreferencesInline(admin.StackedInline):
+class PreferencesInline(admin.TabularInline):
     model = models.Preferences
 
     fieldsets = [
@@ -26,6 +26,13 @@ class PreferencesInline(admin.StackedInline):
     ]
 
 
+class MetUsersInline(admin.TabularInline):
+    model = models.Review
+    fk_name = 'reviewer'
+
+    extra = 0
+
+
 @admin.register(models.SiteUser)
 class SiteUserAdmin(admin.GeoModelAdmin):  # TODO: Change to OSMModelAdmin?
     """
@@ -35,7 +42,12 @@ class SiteUserAdmin(admin.GeoModelAdmin):  # TODO: Change to OSMModelAdmin?
     model = models.SiteUser
 
     # These fields must be specified here to use them in fieldsets
-    readonly_fields = ('location_updated_at', 'latitude', 'longitude')
+    readonly_fields = (
+        'location_updated_at',
+        'latitude',
+        'longitude',
+        'active_rundezvous',  # Add a link?
+    )
 
     fieldsets = [
         ('User', {
@@ -65,14 +77,12 @@ class SiteUserAdmin(admin.GeoModelAdmin):  # TODO: Change to OSMModelAdmin?
         }),
         ('Rundezvous', {
            'fields': (
-               'active_room',
                'active_rundezvous',
-               'met_users',
            ),
         }),
     ]
 
-    inlines = (PreferencesInline,)
+    inlines = (PreferencesInline, MetUsersInline)
 
 
 @admin.register(models.Rundezvous)

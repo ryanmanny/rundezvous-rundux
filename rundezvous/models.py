@@ -3,8 +3,6 @@ import datetime
 from django.contrib.gis.db import models as models
 from django.contrib.auth import models as auth_models
 
-from django.contrib.gis.db.models import Subquery
-
 from django.utils import timezone
 from django.contrib.gis import measure
 
@@ -80,23 +78,19 @@ class SiteUser(auth_models.AbstractUser):
             (LOOKING, 'Looking'),
             (RUNNING, 'Running'),
             (REVIEW, 'Review'),
-        ]
+        ],
+        default=NONE,
     )
-    active_room = models.ForeignKey(  # User can only access one room at a time
-        chat_models.ChatRoom,
-        null=True,  # User can exist without room
-        blank=True,
-        on_delete=models.SET_NULL,
-    )
-    active_rundezvous = models.ForeignKey(
+    rundezvouses = models.ManyToManyField(
         'Rundezvous',
-        null=True,
+        related_name='users',
+        through='UserToRundezvous',
         blank=True,
-        on_delete=models.SET_NULL,  # User can exist without Rundezvous
     )
     met_users = models.ManyToManyField(
         'self',
-        symmetrical=True,  # If I've met you, you've met me
+        through='Review',
+        symmetrical=False,
         blank=True,
     )
 
@@ -111,6 +105,18 @@ class SiteUser(auth_models.AbstractUser):
     def longitude(self):
         return self.location.x
 
+    @property
+    def active_rundezvous(self):
+        try:
+            return self.usertorundezvous_set.objects.get(
+                is_active=True,
+            )
+        except Rundezvous.DoesNotExist:
+            return None
+        except Rundezvous.MultipleObjectsReturned:
+            # TODO: Figure out what to do here, this is bad but possible
+            raise
+
     def update_location(self, new_location):
         """
         Called by the middleware to update user's location
@@ -120,7 +126,7 @@ class SiteUser(auth_models.AbstractUser):
 
         self.save()
 
-        # TODO: Maybe this should only happen on log in
+        # TODO: Maybe this should only happen on log in, could get slow
         # self.update_region()
         # if self.region is None:
         #     # User not in any supported region
@@ -131,8 +137,7 @@ class SiteUser(auth_models.AbstractUser):
 
     def update_region(self):
         """
-        Called by the middleware to update user's region
-        Uses User.location to automatically detect region
+        Uses User.location to update user's region
         """
         try:
             region = place_models.SupportedRegion.objects.get(
@@ -157,9 +162,9 @@ class SiteUser(auth_models.AbstractUser):
 
         rundezvous_location = self.active_rundezvous.landmark.location
         distance = self.location.distance(rundezvous_location)
-        # TODO: Figure out what units distance are in, it's probably meters
+        # TODO: Figure out what the distance function returns
 
-        return measure.D(m=distance) < const.MEETUP_DISTANCE_THRESHOLD
+        return distance < const.MEETUP_DISTANCE_THRESHOLD
 
     def handle_rundezvous_arrival(self):
         """
@@ -212,41 +217,13 @@ class Review(models.Model):
     )
 
     showed_up = models.BooleanField(
-        null=True,
+        null=True,  # Null if they're not sure
         blank=True,
         default=None,
     )
 
-
-class RundezvousLog(models.Model):
-    """
-    Logs what happened on a completed Rundezvous
-    """
-    SUCCESSFUL = 'S'
-    FAILED = 'F'
-    EXPIRED = 'E'
-
-    status = models.CharField(
-        max_length=1,
-        choices=[
-            (SUCCESSFUL, 'Successful'),
-            (FAILED, 'Failed'),
-            (EXPIRED, 'Expired'),
-        ],
-    )
-
-    started = models.DateTimeField()
-    ended = models.DateTimeField(
-        null=True,  # Null when the Rundezvous expired
-        blank=True,
-    )
-
-    chatroom = models.ForeignKey(
-        chat_models.ChatRoom,
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-    )
+    # TODO: Add more criteria, but be careful not to get too judgmental
+    # Maybe like describe in one word or a multiple choice 'aura' field
 
 
 class Rundezvous(models.Model):
@@ -268,7 +245,7 @@ class Rundezvous(models.Model):
         blank=True,
     )
 
-    chatroom = models.ForeignKey(
+    chatroom = models.OneToOneField(
         chat_models.ChatRoom,
         on_delete=models.CASCADE,  # This missing would be messy
     )
@@ -280,11 +257,11 @@ class Rundezvous(models.Model):
         validators=[
             MinValueValidator(0),
             MaxValueValidator(const.MAX_RUNDEZVOUS_EXPIRATION.seconds),
-        ]
+        ],
     )
 
     def __str__(self):
-        return f"{self._meta.verbose_name} <{self.siteuser_set} meeting at {self.landmark}>"
+        return f"{self._meta.verbose_name} <{self.users} meeting at {self.landmark}>"
 
     @property
     def time_elapsed(self) -> datetime.timedelta:
@@ -306,18 +283,21 @@ class Rundezvous(models.Model):
     def is_expired(self):
         return self.time_left < datetime.timedelta(seconds=0)
 
-    def clean_up(self, status=RundezvousLog.EXPIRED):
-        """
-        The function is called when a Rundezvous is finished
-        """
-        users = self.siteuser_set.all()
 
-        RundezvousLog.objects.create(
-            status=status,
-            started=self.created_at,
-            stopped=self.ended_at or self.expiration_datetime,
-            users=Subquery(users),
-            chat_room=users.first().active_room,  # Assume it was the same
-        )
+class UserToRundezvous(models.Model):
+    """
+    This model exists so old Rundezvouses can better reflect what happen
+    TODO: Think up a better name
+    """
+    user = models.ForeignKey(
+        SiteUser,
+        on_delete=models.CASCADE,
+    )
+    rundezvous = models.ForeignKey(
+        Rundezvous,
+        on_delete=models.CASCADE,
+    )
 
-        self.delete()
+    is_active = models.BooleanField(
+        default=True,
+    )
