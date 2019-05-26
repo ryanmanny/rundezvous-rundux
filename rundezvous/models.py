@@ -297,7 +297,8 @@ class ChatMessage(models.Model):
     Abstract ChatMessage, associated with a ChatRoom
     """
     class Meta:
-        ordering = ('sent_at',)  # TODO: This might be unnecessary because sent_at should correlated with id
+        # TODO: This might be unnecessary because sent_at should correlated with id
+        ordering = ('sent_at',)
 
     room = models.ForeignKey(
         Rundezvous,
@@ -305,7 +306,8 @@ class ChatMessage(models.Model):
         related_name='messages',
     )
     text = models.CharField(
-        max_length=const.MAX_CHAT_MESSAGE_LENGTH,  # Twitter knew what they were doing I guess
+        # Twitter knew what they were doing I guess
+        max_length=const.MAX_CHAT_MESSAGE_LENGTH,
     )
     sent_by = models.ForeignKey(
         SiteUser,
