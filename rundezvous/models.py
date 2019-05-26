@@ -95,7 +95,7 @@ class SiteUser(auth_models.AbstractUser):
     )
 
     def __str__(self):
-        return f"{self.display_name if self.display_name else 'NONE'} - {self.email}"
+        return f"{self.display_name or 'NONE'} - {self.email}"
 
     @property
     def latitude(self):
