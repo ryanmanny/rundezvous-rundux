@@ -59,6 +59,9 @@ class SiteUserSet(models.QuerySet):
     def meetable_users_within(self, user, miles):
         """
         Gets all users less than distance miles away from user
+        This should be used to find the next user to match with
+        TODO: Generalize the miles arg
+        TODO: Generalize the distance stuff into its own Query method
         """
         from rundezvous.models import SiteUser
 
