@@ -17,5 +17,5 @@ function update_location(url) {
     } else {
         console.log("GPS not available");
     }
-    setTimeout(update_location, timeout);
+    setTimeout(() => update_location(url), timeout);
 }
