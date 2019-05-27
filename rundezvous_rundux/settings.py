@@ -25,7 +25,10 @@ SECRET_KEY = '8mvacv)u&d@zj+tiwiy+!y$t)v8mzya3y#esnpnzy1t@pk@r*m'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+if DEBUG:
+    ALLOWED_HOSTS = ['*']
+else:
+    ALLOWED_HOSTS = ['.rundezvous.com']
 
 
 # Application definition
