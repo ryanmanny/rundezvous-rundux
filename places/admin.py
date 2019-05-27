@@ -1,13 +1,13 @@
-from django.contrib import admin
+from django.contrib.gis import admin
 
 from places import models
 
 
 @admin.register(models.SupportedRegion)
-class SupportedRegionAdmin(admin.ModelAdmin):
+class SupportedRegionAdmin(admin.GeoModelAdmin):
     pass
 
 
 @admin.register(models.Landmark)
-class LandmarkAdmin(admin.ModelAdmin):
+class LandmarkAdmin(admin.GeoModelAdmin):
     pass
