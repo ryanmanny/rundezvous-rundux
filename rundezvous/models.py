@@ -179,6 +179,18 @@ class SiteUser(auth_models.AbstractUser):
         active_rundezvous.ended_at = timezone.now()
         active_rundezvous.save()
 
+    def find_rundezvous(self):
+        partner = SiteUser.objects \
+            .meetable_users_within(self, const.MEETUP_DISTANCE_THRESHOLD) \
+            .order_by_closest_to(self).first()
+
+        if partner is None:
+            self.status = self.Status.LOOKING
+            self.save()
+            raise SiteUser.DoesNotExist
+        else:
+            return Rundezvous.create_for_users([self, partner])
+
 
 class Preferences(models.Model):
     class Meta:
@@ -271,6 +283,36 @@ class Rundezvous(models.Model):
     def is_expired(self):
         # TODO: -> NullBoolean property pseudo-field since these can't UNexpire?
         return self.seconds_left < 0
+
+    @classmethod
+    def create_for_users(cls, users):
+        """
+        Create a Rundezvous, and add all of the users to it
+        This should work for any number of users, even just one
+        """
+        if not isinstance(users, models.QuerySet):
+            # We need some QuerySet methods
+            users = SiteUser.objects.filter(id__in=[user.id for user in users])
+
+        region = users.first().region  # Assume they're all in the same region
+        midpoint = users.get_midpoint()
+
+        # Get closest Landmark
+        landmarks = place_models.Landmark.objects.filter(region=region)
+        landmark = landmarks.order_by_closest_to(midpoint).first()
+
+        rundezvous = cls.objects.create(
+            landmark=landmark,
+            expiration_seconds=60,  # TODO: Calculate this somehow
+        )
+
+        for user in users:
+            user.rundezvouses.add(
+                rundezvous,
+                through_defaults={'is_active': True},
+            )
+            user.rundezvous_status = SiteUser.Status.RUNNING
+            user.save()
 
 
 class UserToRundezvous(models.Model):

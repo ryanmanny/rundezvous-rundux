@@ -49,16 +49,6 @@ class SiteUserSet(models.QuerySet):
             id__in=Subquery(met_users),
         )
 
-    def order_by_closest_to(self, user):
-        """
-        Gets closest compatible user to current user
-        """
-        return self.annotate(
-            distance=Distance('location', user.location),
-        ).order_by(
-            'distance',
-        )
-
     def meetable_users_within(self, user, distance: measure.Distance):
         """
         Gets all users less than distance miles away from user
@@ -67,14 +57,18 @@ class SiteUserSet(models.QuerySet):
         """
         from rundezvous.models import SiteUser
 
-        return self.active().havent_met(
-            user,
-        ).filter(
+        return self.active().havent_met(user).filter(
             location__distance_lte=(user.location, distance),
             rundezvous_status=SiteUser.Status.LOOKING,
-        ).order_by_closest_to(
-            user,
         )
+
+    def order_by_closest_to(self, user):
+        """
+        Gets closest compatible user to current user
+        """
+        return self \
+            .annotate(distance=Distance('location', user.location)) \
+            .order_by('distance')
 
 
 class SiteUserManager(auth_models.UserManager.from_queryset(SiteUserSet)):

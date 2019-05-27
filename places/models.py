@@ -1,5 +1,7 @@
 from django.contrib.gis.db import models
 
+from places import managers
+
 
 class SupportedRegion(models.Model):
     """
@@ -19,6 +21,8 @@ class Landmark(models.Model):
     """
     Describes a Landmark that users can meet at
     """
+    objects = managers.LandmarkManager()
+
     name = models.CharField(max_length=50)
     # place_type = models.CharField(choices=)
 
