@@ -110,9 +110,9 @@ class SiteUser(auth_models.AbstractUser):
     @property
     def active_rundezvous(self):
         try:
-            return self.usertorundezvous_set.objects.get(
+            return self.usertorundezvous_set.get(
                 is_active=True,
-            )
+            ).rundezvous
         except Rundezvous.DoesNotExist:
             return None
         except Rundezvous.MultipleObjectsReturned:
@@ -162,11 +162,19 @@ class SiteUser(auth_models.AbstractUser):
         if self.active_rundezvous is None:
             return None
 
-        rundezvous_location = self.active_rundezvous.landmark.location
-        distance = self.location.distance(rundezvous_location)
-        # TODO: Figure out what the distance function returns
+        # The user's location is stored in lat long (srid=4326) so it must be
+        # transformed into a coordinate system measure in meters before the
+        # distance between the two points can be calculated
 
-        return distance < const.MEETUP_DISTANCE_THRESHOLD
+        srid = self.region.projected_srid  # The default
+
+        location = self.location. \
+            transform(srid, clone=True)
+        landmark_location = self.active_rundezvous.landmark.location. \
+            transform(srid, clone=True)
+        distance = location.distance(landmark_location)
+
+        return measure.Distance(m=distance) < const.MEETUP_DISTANCE_THRESHOLD
 
     def handle_rundezvous_arrival(self):
         """

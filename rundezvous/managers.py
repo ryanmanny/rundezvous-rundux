@@ -59,7 +59,7 @@ class SiteUserSet(models.QuerySet):
 
         return self.active().havent_met(user).filter(
             location__distance_lte=(user.location, distance),
-            rundezvous_status=SiteUser.Status.LOOKING,
+            status=SiteUser.Status.LOOKING,
         )
 
     def order_by_closest_to(self, user):

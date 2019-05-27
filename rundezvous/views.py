@@ -79,9 +79,6 @@ def chatroom(request):
 def active_rundezvous(request):
     user = request.user
 
-    if user.active_rundezvous is None:
-        return HttpResponseNotFound
-
     return render(request, 'rundezvous/active_rundezvous.html', {
         'rundezvous': user.active_rundezvous,
     })
