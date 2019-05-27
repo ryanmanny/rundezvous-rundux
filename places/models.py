@@ -13,8 +13,12 @@ class SupportedRegion(models.Model):
     region = models.PolygonField()  # Assume university is contiguous
 
     class UnsupportedRegionError(Exception):
-        """User is not in any supported region
         """
+        User is not in any supported region
+        """
+
+    def __str__(self):
+        return self.name
 
 
 class Landmark(models.Model):
@@ -34,3 +38,6 @@ class Landmark(models.Model):
         blank=True,
         on_delete=models.SET_NULL,
     )
+
+    def __str__(self):
+        return self.name

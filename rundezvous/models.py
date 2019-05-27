@@ -1,3 +1,5 @@
+from typing import Iterable
+
 from django.contrib.gis.db import models as models
 from django.contrib.auth import models as auth_models
 
@@ -95,7 +97,7 @@ class SiteUser(auth_models.AbstractUser):
     )
 
     def __str__(self):
-        return f"{self.display_name or 'NONE'} - {self.email}"
+        return f"{self.email} ({self.display_name or '?'})"
 
     @property
     def latitude(self):
@@ -212,6 +214,9 @@ class Preferences(models.Model):
     hookups = models.BooleanField(default=False)
     # TODO: Add some less obvious ones
 
+    def __str__(self):
+        return f"{self.user}'s {self._meta.verbose_name}"
+
 
 class Review(models.Model):
     """
@@ -236,6 +241,9 @@ class Review(models.Model):
 
     # TODO: Add more criteria, but be careful not to get too judgmental
     # Maybe like describe in one word or a multiple choice 'aura' field
+
+    def __str__(self):
+        return f"{self.reviewer} reviewed {self.reviewed}"
 
 
 class Rundezvous(models.Model):
@@ -269,7 +277,7 @@ class Rundezvous(models.Model):
     )
 
     def __str__(self):
-        return f"{self.users} meeting at {self.landmark}"
+        return f"{[user for user in self.users.all()]} meeting at {self.landmark}"
 
     @property
     def expires_at(self) -> timezone.datetime:
@@ -285,7 +293,7 @@ class Rundezvous(models.Model):
         return self.seconds_left < 0
 
     @classmethod
-    def create_for_users(cls, users):
+    def create_for_users(cls, users: Iterable[SiteUser]):
         """
         Create a Rundezvous, and add all of the users to it
         This should work for any number of users, even just one
@@ -320,6 +328,10 @@ class UserToRundezvous(models.Model):
     This model exists so old Rundezvouses can better reflect what happen
     TODO: Think up a better name
     """
+    class Meta:
+        verbose_name = 'user to rundezvous'
+        verbose_name_plural = 'user to rundezvouses'
+
     user = models.ForeignKey(
         SiteUser,
         on_delete=models.CASCADE,
@@ -360,4 +372,4 @@ class ChatMessage(models.Model):
     )
 
     def __str__(self):
-        return f"{self.sent_by} - {self.text}"
+        return f'{self.sent_by} says "{self.text}"'
