@@ -13,6 +13,11 @@ class SupportedRegion(models.Model):
 
     region = models.PolygonField(srid=const.DEFAULT_SRID)
 
+    projected_srid = models.IntegerField(
+        # The SRID used to calculate distance between locations in this region
+        default=const.DEFAULT_PROJECTION_SRID,
+    )
+
     class UnsupportedRegionError(Exception):
         """
         User is not in any supported region
