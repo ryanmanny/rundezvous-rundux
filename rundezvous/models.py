@@ -10,6 +10,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 
 # Rundezvous depends on Chat, Places apps
 from places import models as place_models
+from places import const as place_const
 
 from rundezvous import const
 from rundezvous import managers
@@ -48,6 +49,7 @@ class SiteUser(auth_models.AbstractUser):
         verbose_name="Last Known Location",
         null=True,
         blank=True,
+        srid=place_const.DEFAULT_SRID,
     )
     region = models.ForeignKey(
         place_models.SupportedRegion,

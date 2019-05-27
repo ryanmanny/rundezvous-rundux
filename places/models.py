@@ -1,16 +1,17 @@
 from django.contrib.gis.db import models
 
 from places import managers
+from places import const
 
 
 class SupportedRegion(models.Model):
     """
     Describes the geometry of a Region supported by the system
-    This may need to be totally changed in the future
+    This system may need to be totally changed in the future
     """
     name = models.CharField(max_length=50)
 
-    region = models.PolygonField()  # Assume university is contiguous
+    region = models.PolygonField(srid=const.DEFAULT_SRID)
 
     class UnsupportedRegionError(Exception):
         """
@@ -30,10 +31,10 @@ class Landmark(models.Model):
     name = models.CharField(max_length=50)
     # place_type = models.CharField(choices=)
 
-    location = models.PointField()
+    location = models.PointField(srid=const.DEFAULT_SRID)
 
     region = models.ForeignKey(
-        'SupportedRegion',
+        SupportedRegion,
         null=True,
         blank=True,
         on_delete=models.SET_NULL,

@@ -7,6 +7,8 @@ from django.http import JsonResponse
 
 from django.views.decorators.csrf import csrf_exempt
 
+from places import const
+
 
 def geo_test(request):
     """
@@ -24,7 +26,7 @@ def update_location(request):
     long = float(request.POST.get('long'))
 
     # Longitude is x, Latitude is y
-    location = Point(long, lat, srid=4326)
+    location = Point(long, lat, srid=const.DEFAULT_SRID)
 
     user = request.user
 
