@@ -59,8 +59,6 @@ class SiteUser(auth_models.AbstractUser):
         on_delete=models.SET_NULL,
     )
     location_updated_at = models.DateTimeField(
-        auto_now_add=timezone.now,
-        editable=True,
         null=True,
         blank=True,
         db_index=True,  # To get active users quickly
