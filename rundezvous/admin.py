@@ -85,9 +85,18 @@ class SiteUserAdmin(admin.GeoModelAdmin):  # TODO: Change to OSMModelAdmin?
 
 @admin.register(models.Rundezvous)
 class RundezvousAdmin(admin.ModelAdmin):
+    readonly_fields = ('started_at',)
+    fields = ('started_at', 'ended_at', 'landmark', 'expiration_seconds',)
+
+    class UserInline(admin.TabularInline):
+        model = models.SiteUser.rundezvouses.through
+        extra = 0
+
+        show_change_link = True
+
     class ChatMessageInline(admin.TabularInline):
         model = models.ChatMessage
 
         extra = 1
 
-    inlines = [ChatMessageInline]
+    inlines = [UserInline, ChatMessageInline]
