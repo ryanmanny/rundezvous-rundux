@@ -23,6 +23,8 @@ class SiteUserAdmin(admin.GeoModelAdmin):
         'active_rundezvous',  # Add a link?
     )
 
+    list_display = ('email', 'region',)
+
     fieldsets = [
         ('User', {
             'fields': (
