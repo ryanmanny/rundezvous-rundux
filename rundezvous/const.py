@@ -13,3 +13,4 @@ MEETUP_DISTANCE_THRESHOLD = Distance(m=800)  # About half a mile, quarter each
 MAX_CHAT_MESSAGE_LENGTH = 140
 # How long users can chat before the Rundezvous Decision must be made
 CHAT_TIME_LIMIT = timezone.timedelta(minutes=2)
+MEET_DECISION_TIME_LIMIT = timezone.timedelta(seconds=30)

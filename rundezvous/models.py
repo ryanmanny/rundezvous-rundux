@@ -191,6 +191,22 @@ class SiteUser(auth_models.AbstractUser):
         active_rundezvous.ended_at = timezone.now()
         active_rundezvous.save()
 
+    def make_meetup_decision(self, decision: bool):
+        rundezvous = self.active_rundezvous
+
+        utr = UserToRundezvous.objects.get(
+            # TODO: See if there's a better way to get this object
+            # I would make a helper function but I don't know what to call it
+            user=self,
+            rundezvous=rundezvous,
+        )
+
+        if timezone.now() < rundezvous.meet_decision_ends_at:
+            utr.meetup_decision = decision
+            utr.save()
+        else:
+            raise Rundezvous.DecisionTimeoutError
+
     def find_partner(self):
         partner = SiteUser.objects \
             .meetable_users_within(self, const.MEETUP_DISTANCE_THRESHOLD) \
@@ -297,20 +313,41 @@ class Rundezvous(models.Model):
         ],
     )
 
+    # TODO: Add archival logic
+
     def __str__(self):
         return f"{[user for user in self.users.all()]} meeting at {self.landmark}"
 
+    class DecisionTimeoutError(TimeoutError):
+        pass
+
+    class RunTimeError(TimeoutError):
+        pass
+
+    @property
+    def chat_ends_at(self) -> timezone.datetime:
+        return self.created_at + const.CHAT_TIME_LIMIT
+
+    @property
+    def meet_decision_ends_at(self) -> timezone.datetime:
+        return self.created_at + \
+               const.CHAT_TIME_LIMIT + const.MEET_DECISION_TIME_LIMIT
+
     @property
     def expires_at(self) -> timezone.datetime:
-        return self.started_at + timezone.timedelta(seconds=self.expiration_seconds)
+        if self.landmark is not None:
+            return self.started_at + \
+                   timezone.timedelta(seconds=self.expiration_seconds)
+        else:
+            raise place_models.Landmark.DoesNotExist
 
     @property
     def seconds_left(self) -> int:
+        """This will also be computed in the GUI if I'm not insane"""
         return int((self.expires_at - timezone.now()).total_seconds())
 
     @property
     def is_expired(self):
-        # TODO: -> NullBoolean property pseudo-field since these can't UNexpire?
         return self.seconds_left < 0
 
     @classmethod
@@ -353,7 +390,7 @@ class Rundezvous(models.Model):
 
 class UserToRundezvous(models.Model):
     """
-    This model exists so old Rundezvouses can better reflect what happen
+    This model exists so old Rundezvouses can better reflect what happened
     TODO: Think up a better name
     """
     class Meta:
@@ -371,6 +408,10 @@ class UserToRundezvous(models.Model):
 
     is_active = models.BooleanField(
         default=True,
+    )
+
+    meetup_decision = models.NullBooleanField(
+        default=None,
     )
 
 
