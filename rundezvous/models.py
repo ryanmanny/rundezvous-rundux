@@ -316,7 +316,7 @@ class Rundezvous(models.Model):
     # TODO: Add archival logic
 
     def __str__(self):
-        return f"{[user for user in self.users.all()]} meeting at {self.landmark}"
+        return f"{[u for u in self.users.all()]} meeting at {self.landmark}"
 
     class DecisionTimeoutError(TimeoutError):
         pass
