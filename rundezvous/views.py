@@ -58,14 +58,14 @@ def chatroom(request):
     """
     user = request.user
 
-    room = user.active_room
+    room = user.active_rundezvous
 
     if room is None:
         return HttpResponseNotFound("You are not in any chatroom")
 
     return render(
         request,
-        'rundezvous/rundezvous_chatroom.html',
+        'rundezvous/chatroom/chatroom.html',
         {
             'user': user,
             'room': room,
@@ -99,7 +99,7 @@ def chatroom(request):
 
     return render(
         request,
-        'rundezvous/chatroom.html',
+        'rundezvous/chatroom/chatroom.html',
         {
             'user': user,
             'room': room,
@@ -158,7 +158,7 @@ def message(request, message_id=None):
 
     return render(
         request,
-        'rundezvous/message.html',
+        'rundezvous/chatroom/message.html',
         {
             'message': message,
             'user': user,

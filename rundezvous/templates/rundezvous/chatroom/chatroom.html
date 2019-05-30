@@ -1,16 +1,16 @@
-{% extends 'chat/base.html' %}
+{% extends 'rundezvous/base.html' %}
 
 {% block content %}
 <div class="chatroom-wrapper">
-    {% include 'chat/chatroom_header.html' with header_text=room.name %}
+    {% include 'rundezvous/chatroom/chatroom_header.html' with header_text=room.name %}
     <div class="messages-container" id="messages-container">
         <ul class="messages-list" id="messages-list">
         {% for message in room.messages.all %}
             {# Automatically renders existing messages #}
-            {% include 'chat/message.html' with user=user message=message %}
+            {% include 'rundezvous/chatroom/message.html' with user=user message=message %}
         {% endfor %}
         </ul>
-        {% include 'chat/message_submit.html' %}
+        {% include 'rundezvous/chatroom/message_submit.html' %}
     </div>
 </div>
 

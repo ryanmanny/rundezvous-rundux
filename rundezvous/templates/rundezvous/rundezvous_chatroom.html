@@ -1,7 +1,0 @@
-{% extends 'chat/chatroom.html' %}
-
-<script>
-setTimeout(function() {
-    window.location.href = '{% url 'active_rundezvous' %}';
-}, {{ time_limit }});
-</script>
