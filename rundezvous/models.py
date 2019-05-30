@@ -333,7 +333,9 @@ class Rundezvous(models.Model):
         """
         Sets the closest landmark as the destination, then starts the timer
         """
-        assert self.users.exists()
+        if not self.users.exists():
+            raise SiteUser.DoesNotExist
+
         users = self.users
 
         region = users.first().region  # Assume they're all in the same region
