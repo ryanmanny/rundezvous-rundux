@@ -2,7 +2,7 @@ from django.utils import timezone
 from django.contrib.gis.measure import Distance
 
 # The time after which all Users will become inactive if location hasn't updated
-USER_ACTIVE_TIME = timezone.timedelta(days=7)
+USER_ACTIVE_TIME = timezone.timedelta(hours=1)
 
 # The time after which all Rundezvouses will be assumed expired
 MAX_RUNDEZVOUS_EXPIRATION = timezone.timedelta(hours=1)
