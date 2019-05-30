@@ -1,4 +1,4 @@
-// TODO: Remove this in favor of Django Channels
+// TODO: Remove all of this logic in favor of Django Channels
 function ajax_form(selector, callback)
 {
     let form = $(selector);
@@ -49,5 +49,5 @@ function check_for_messages(timeout)
         }
     });
 
-    setTimeout(check_for_messages, timeout);
+    setTimeout(() => check_for_messages(timeout), timeout);
 }
