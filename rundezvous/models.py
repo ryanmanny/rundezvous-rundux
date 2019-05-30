@@ -68,6 +68,7 @@ class SiteUser(auth_models.AbstractUser):
     class Status:
         NONE = 'N'
         LOOKING = 'L'
+        CHATTING = 'C'
         RUNNING = 'R'
         REVIEW = 'V'
 
@@ -78,6 +79,7 @@ class SiteUser(auth_models.AbstractUser):
         choices=[
             (Status.NONE, 'None'),
             (Status.LOOKING, 'Looking'),
+            (Status.CHATTING, 'Chatting'),
             (Status.RUNNING, 'Running'),
             (Status.REVIEW, 'Review'),
         ],
@@ -189,7 +191,7 @@ class SiteUser(auth_models.AbstractUser):
         active_rundezvous.ended_at = timezone.now()
         active_rundezvous.save()
 
-    def find_rundezvous(self):
+    def find_partner(self):
         partner = SiteUser.objects \
             .meetable_users_within(self, const.MEETUP_DISTANCE_THRESHOLD) \
             .order_by_closest_to(self).first()
@@ -257,6 +259,7 @@ class Review(models.Model):
 class Rundezvous(models.Model):
     """
     The titular unit of data, describes the meetup between two+ users
+    When a Rundezvous is first created it is just a Chatroom
     """
     class Meta:
         verbose_name = 'rundezvous'
@@ -264,8 +267,14 @@ class Rundezvous(models.Model):
 
     objects = managers.RundezvousManager()
 
-    started_at = models.DateTimeField(  # Used to time out users
+    created_at = models.DateTimeField(
         auto_now_add=True,
+    )
+
+    started_at = models.DateTimeField(  # Used to time out users
+        default=None,
+        null=True,
+        blank=True,
     )
     ended_at = models.DateTimeField(
         default=None,
@@ -275,9 +284,13 @@ class Rundezvous(models.Model):
 
     landmark = models.ForeignKey(
         place_models.Landmark,
+        null=True,
+        blank=True,
         on_delete=models.CASCADE,  # Meetup needs a location
     )
     expiration_seconds = models.IntegerField(
+        null=True,
+        blank=True,
         validators=[
             MinValueValidator(0),
             MaxValueValidator(const.MAX_RUNDEZVOUS_EXPIRATION.seconds),
@@ -306,29 +319,34 @@ class Rundezvous(models.Model):
         Create a Rundezvous, and add all of the users to it
         This should work for any number of users, even just one
         """
-        if not isinstance(users, models.QuerySet):
-            # We need some QuerySet methods
-            users = SiteUser.objects.filter(id__in=[user.id for user in users])
+        rundezvous = cls.objects.create()
+
+        for user in users:
+            user.rundezvouses.add(  # Pycharm is mistaken here
+                rundezvous,
+                through_defaults={'is_active': True},
+            )
+            user.rundezvous_status = SiteUser.Status.CHATTING
+            user.save()
+
+    def start_meetup(self):
+        """
+        Sets the closest landmark as the destination, then starts the timer
+        """
+        assert self.users.exists()
+        users = self.users
 
         region = users.first().region  # Assume they're all in the same region
         midpoint = users.get_midpoint()
 
         # Get closest Landmark
-        landmarks = place_models.Landmark.objects.filter(region=region)
-        landmark = landmarks.order_by_closest_to(midpoint).first()
+        landmark = place_models.Landmark.objects.filter(region=region) \
+            .order_by_closest_to(midpoint).first()
 
-        rundezvous = cls.objects.create(
-            landmark=landmark,
-            expiration_seconds=60,  # TODO: Calculate this somehow
-        )
-
-        for user in users:
-            user.rundezvouses.add(
-                rundezvous,
-                through_defaults={'is_active': True},
-            )
-            user.rundezvous_status = SiteUser.Status.RUNNING
-            user.save()
+        self.landmark = landmark
+        self.started_at = timezone.now()
+        self.expiration_seconds = 600  # TODO: Calculate this somehow
+        self.save()
 
 
 class UserToRundezvous(models.Model):

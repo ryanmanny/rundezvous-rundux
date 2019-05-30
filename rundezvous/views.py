@@ -43,7 +43,7 @@ def waiting_room(request):
     user = request.user
 
     try:
-        user.find_rundezvous()
+        user.find_partner()
     except models.SiteUser.DoesNotExist:
         return render(request, 'rundezvous/waiting_room.html', {})
     else:
