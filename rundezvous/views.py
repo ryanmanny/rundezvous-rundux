@@ -39,6 +39,11 @@ def signup(request):
 
 
 @login_required
+def location_required(request):
+    return render(request, 'rundezvous/location_required.html')
+
+
+@login_required
 def waiting_room(request):
     user = request.user
 

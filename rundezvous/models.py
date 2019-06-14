@@ -38,6 +38,7 @@ class SiteUser(auth_models.AbstractUser):
             ('F', 'Female'),
             ('O', 'Other'),
         ],
+        default='M',  # Women's movement over
     )
     # display_color TODO: Import django-colorpicker
     reputation = models.IntegerField(
@@ -115,9 +116,9 @@ class SiteUser(auth_models.AbstractUser):
             return self.usertorundezvous_set.get(
                 is_active=True,
             ).rundezvous
-        except Rundezvous.DoesNotExist:
+        except UserToRundezvous.DoesNotExist:
             return None
-        except Rundezvous.MultipleObjectsReturned:
+        except UserToRundezvous.MultipleObjectsReturned:
             # TODO: Figure out what to do here, this is bad but possible
             raise
 
