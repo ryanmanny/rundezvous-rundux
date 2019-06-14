@@ -420,7 +420,6 @@ class ChatMessage(models.Model):
     Abstract ChatMessage, associated with a ChatRoom
     """
     class Meta:
-        # TODO: This might be unnecessary because sent_at should correlated with id
         ordering = ('sent_at',)
 
     room = models.ForeignKey(
