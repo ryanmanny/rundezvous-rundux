@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -24,6 +25,7 @@ SECRET_KEY = '8mvacv)u&d@zj+tiwiy+!y$t)v8mzya3y#esnpnzy1t@pk@r*m'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+TESTING = 'test' in sys.argv
 
 if DEBUG:
     ALLOWED_HOSTS = ['*']
@@ -116,6 +118,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+if TESTING:
+    PASSWORD_HASHERS = [
+        # Much cheaper
+        'django.contrib.auth.hashers.MD5PasswordHasher',
+    ]
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
