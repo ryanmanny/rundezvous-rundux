@@ -12,3 +12,12 @@ class LandmarkSet(models.QuerySet):
 
 class LandmarkManager(models.Manager.from_queryset(LandmarkSet)):
     pass
+
+
+class SupportedRegionQuerySet(models.QuerySet):
+    def get_for_point(self, point):
+        return self.get(region__intersects=point)
+
+
+class SupportedRegionManager(models.Manager.from_queryset(SupportedRegionQuerySet)):
+    pass

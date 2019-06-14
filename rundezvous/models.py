@@ -145,17 +145,15 @@ class SiteUser(auth_models.AbstractUser):
         Uses User.location to update user's region
         """
         try:
-            region = place_models.SupportedRegion.objects.get(
-                region__intersects=self.location,
-            )
+            region = place_models.SupportedRegion.\
+                objects.get_for_point(self.location)
         except place_models.SupportedRegion.DoesNotExist:
-            self.region = None
+            region = None
         except place_models.SupportedRegion.MultipleObjectsReturned:
             # TODO: Consider overlapping regions, maybe log collisions here
             raise NotImplementedError
-        else:
-            self.region = region
 
+        self.region = region
         self.save()
 
     def check_rundezvous_arrived(self):

@@ -9,19 +9,15 @@ class SupportedRegion(models.Model):
     Describes the geometry of a Region supported by the system
     This system may need to be totally changed in the future
     """
+    objects = managers.SupportedRegionManager()
+
     name = models.CharField(max_length=50)
 
     region = models.PolygonField(srid=const.DEFAULT_SRID)
-
     projected_srid = models.IntegerField(
         # The SRID used to calculate distance between locations in this region
         default=const.DEFAULT_PROJECTION_SRID,
     )
-
-    class UnsupportedRegionError(Exception):
-        """
-        User is not in any supported region
-        """
 
     def __str__(self):
         return self.name
