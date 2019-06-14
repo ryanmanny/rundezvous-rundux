@@ -137,7 +137,7 @@ class SiteUser(auth_models.AbstractUser):
         #     # User not in any supported region
         #     raise place_models.SupportedRegion.UnsupportedRegionError
 
-        if self.check_rundezvous_arrived():
+        if self.active_rundezvous and self.check_rundezvous_arrived():
             self.handle_rundezvous_arrival()
 
     def update_region(self):
@@ -157,16 +157,10 @@ class SiteUser(auth_models.AbstractUser):
         self.save()
 
     def check_rundezvous_arrived(self):
-        """
-        Returns True if User made it to Rundezvous destination
-        """
-        if self.active_rundezvous is None:
-            return None
-
+        """Returns whether user is within threshold of Rundezvous"""
         # The user's location is stored in lat long (srid=4326) so it must be
         # transformed into a coordinate system measure in meters before the
         # distance between the two points can be calculated
-
         srid = self.region.projected_srid  # The default
 
         location = self.location. \
