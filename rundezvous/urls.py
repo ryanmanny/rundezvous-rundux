@@ -6,7 +6,7 @@ from rundezvous import views
 urlpatterns = [
     path('location_required', views.location_required, name='location_required'),
 
-    path('waiting_room', views.waiting_room, name='waiting_room'),
+    path('rundezvous_router', views.rundezvous_router, name='rundezvous_router'),
     path('active_rundezvous', views.active_rundezvous, name='active_rundezvous'),
 
     # CHAT STUFF

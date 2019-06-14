@@ -15,9 +15,10 @@ from rundezvous import forms
 
 
 def home(request):
-    user = request.user
-
-    return render(request, 'rundezvous/home.html', {'user': user})
+    if request.user.is_anonymous:
+        return redirect(reverse('login'))
+    else:
+        return redirect(reverse('rundezvous_router'))
 
 
 def signup(request):
@@ -44,15 +45,24 @@ def location_required(request):
 
 
 @login_required
-def waiting_room(request):
+def rundezvous_router(request):
+    """Routes user to appropriate destination based on their status"""
     user = request.user
 
-    try:
-        user.find_partner()
-    except models.SiteUser.DoesNotExist:
-        return render(request, 'rundezvous/waiting_room.html', {})
-    else:
-        return redirect(reverse('active_rundezvous'))
+    if user.status == models.SiteUser.Status.NONE:
+        user.status = models.SiteUser.Status.LOOKING
+        user.save()
+
+    if user.status == models.SiteUser.Status.LOOKING:
+        pass
+    elif user.status == models.SiteUser.Status.CHATTING:
+        pass
+    elif user.status == models.SiteUser.Status.RUNNING:
+        pass
+    elif user.status == models.SiteUser.Status.REVIEW:
+        pass
+
+    raise NotImplementedError
 
 
 @login_required
