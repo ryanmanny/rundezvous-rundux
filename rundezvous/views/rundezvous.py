@@ -1,10 +1,18 @@
+from django.http import JsonResponse
+
 from django.shortcuts import render, redirect, reverse
 
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 
+from django.views.decorators.csrf import csrf_exempt
+
+from django.contrib.gis.geos import Point
+
 from rundezvous import models
 from rundezvous import forms
+
+from places import const as place_const
 
 
 def home(request):
@@ -30,6 +38,35 @@ def signup(request):
         form = forms.SignupForm()
 
     return render(request, 'registration/signup.html', {'form': form})
+
+
+@csrf_exempt
+def update_location(request):
+    """
+    Update a user's location
+    This would be pretty easy to spoof TODO: Analyze if that would be a problem
+    """
+    try:
+        lat = float(request.POST.get('lat'))
+        long = float(request.POST.get('long'))
+    except TypeError:
+        # Location services must be on
+        return redirect(reverse('location_required'))
+
+    user = request.user
+
+    # Longitude is x, Latitude is y
+    location = Point(long, lat, srid=place_const.DEFAULT_SRID)
+
+    location_changed = user.location != location
+
+    if location_changed:  # This might be useless
+        user.update_location(location)
+
+    return JsonResponse({
+        'update': location_changed,
+        'success': True,
+    })
 
 
 @login_required
