@@ -54,23 +54,26 @@ def rundezvous_router(request):
         user.save()
 
     if user.status == models.SiteUser.Status.LOOKING:
-        pass
+        return redirect(reverse('waiting_room'))
     elif user.status == models.SiteUser.Status.CHATTING:
-        pass
+        return redirect(reverse('chatroom'))
     elif user.status == models.SiteUser.Status.RUNNING:
-        pass
+        return redirect(reverse('active_rundezvous'))
     elif user.status == models.SiteUser.Status.REVIEW:
-        pass
+        return redirect(reverse('review'))
+    else:
+        raise NotImplementedError
 
+
+@login_required
+def waiting_room(request):
+    """Waiting room for the user while the next Rundezvous is found"""
     raise NotImplementedError
 
 
 @login_required
 def chatroom(request):
-    """
-    Renders Chatroom for the current user
-    TODO: Make this a class-based View?
-    """
+    """Renders Chatroom for the current user"""
     user = request.user
 
     room = user.active_rundezvous
@@ -92,11 +95,23 @@ def chatroom(request):
 
 @login_required
 def active_rundezvous(request):
-    user = request.user
+    """
+    Screen displayed while the user is running to the destination
+    Will show Google Maps frame, and will automatically detect arrival
+    """
+    return render(
+        request,
+        'rundezvous/active_rundezvous.html',
+        {
+            'rundezvous': request.user.active_rundezvous,
+        },
+    )
 
-    return render(request, 'rundezvous/active_rundezvous.html', {
-        'rundezvous': user.active_rundezvous,
-    })
+
+@login_required
+def review(request):
+    """Form for the user to review partner from previous Rundezvous"""
+    raise NotImplementedError
 
 
 @login_required
@@ -130,9 +145,7 @@ def new_messages(request, last_message_id):
     It's also very easily abusable
     TODO: This MUST be replaced with RabbitMQ or Django Channels
     """
-    user = request.user
-
-    room = user.active_room
+    room = request.user.active_rundezvous
 
     messages = room.messages.filter(id__gt=last_message_id)
 
@@ -148,7 +161,7 @@ def message(request, message_id=None):
     TODO: Make this a class-based view?
     """
     user = request.user
-    room = user.active_room  # Make sure user can only get msg from his room
+    room = user.active_rundezvous  # Make sure user can only get msg from his room
 
     if request.method == "GET":
         try:

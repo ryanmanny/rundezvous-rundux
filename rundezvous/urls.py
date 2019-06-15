@@ -7,7 +7,10 @@ urlpatterns = [
     path('location_required', views.location_required, name='location_required'),
 
     path('rundezvous_router', views.rundezvous_router, name='rundezvous_router'),
+
+    path('waiting_room', views.waiting_room, name='waiting_room'),
     path('active_rundezvous', views.active_rundezvous, name='active_rundezvous'),
+    path('review', views.review, name='review'),
 
     # CHAT STUFF
     path('chatroom', views.chatroom, name='chatroom'),
