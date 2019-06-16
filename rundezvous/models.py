@@ -250,7 +250,6 @@ class Rundezvous(models.Model):
     When a Rundezvous is first created it is just a Chatroom
     """
     class Meta:
-        verbose_name = 'rundezvous'
         verbose_name_plural = 'rundezvouses'  # (nonstandard, rare)
 
     objects = managers.RundezvousManager()
@@ -366,7 +365,6 @@ class UserToRundezvous(models.Model):
     TODO: Think up a better name
     """
     class Meta:
-        verbose_name = 'user to rundezvous'
         verbose_name_plural = 'user to rundezvouses'
 
     user = models.ForeignKey(
