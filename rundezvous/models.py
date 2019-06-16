@@ -164,13 +164,7 @@ class SiteUser(auth_models.AbstractUser):
 
     def make_meetup_decision(self, decision: bool):
         rundezvous = self.active_rundezvous
-
-        utr = UserToRundezvous.objects.get(
-            # TODO: See if there's a better way to get this object
-            # I would make a helper function but I don't know what to call it
-            user=self,
-            rundezvous=rundezvous,
-        )
+        utr = self.usertorundezvous_set.get(rundezvous=rundezvous)
 
         if timezone.now() < rundezvous.meet_decision_ends_at:
             utr.meetup_decision = decision
