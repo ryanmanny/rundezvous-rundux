@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.core.management import call_command
 
 from django.contrib.gis.geos import Point, Polygon, MultiPolygon
 
@@ -48,3 +49,31 @@ class TestSupportedRegionModel(TestCase):
 
         with self.assertRaises(models.Country.DoesNotExist):
             models.Country.objects.get_for_point(point_in_no_region)
+
+
+# class TestImportCountries(TestCase):
+#     def test_import_countries(self):
+#         self.assertEqual(models.Country.objects.count(), 0)
+#
+#         call_command('import_countries')
+#
+#         self.assertNotEqual(models.Country.objects.count(), 0)
+#
+#     def test_import_countries_with_delete(self):
+#         models.Country.objects.create(
+#             name='Fake Country',
+#             region=MultiPolygon(
+#                 Polygon((
+#                     (0.0, 0.0),
+#                     (0.0, 50.0),
+#                     (50.0, 50.0),
+#                     (50.0, 0.0),
+#                     (0.0, 0.0),
+#                 ))
+#             ),
+#         )
+#
+#         call_command('import_countries')
+#
+#         with self.assertRaises(models.Country.DoesNotExist):
+#             models.Country.objects.get(name='Fake Country')
