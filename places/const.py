@@ -2,3 +2,7 @@
 # This is the ones that Google Maps uses
 DEFAULT_SRID = 4326
 DEFAULT_PROJECTION_SRID = 3857
+
+SUPPORTED_COUNTRIES = {
+    'United States of America',
+}

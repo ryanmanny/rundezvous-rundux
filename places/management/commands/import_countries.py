@@ -13,6 +13,7 @@ from django.contrib.gis.gdal import DataSource
 
 import places
 from places import models
+from places import const
 
 countries_ds = DataSource(
     os.path.abspath(
@@ -52,14 +53,10 @@ class Command(BaseCommand):
             models.Country.objects.all().delete()
             models.State.objects.all().delete()
 
-        supported_countries = {
-            'United States of America',
-        }
-
         countries = {
             feature.get('name'): feature
             for feature in countries_ds[0]  # Shapefiles only have one layer
-            if feature.get('name') in supported_countries
+            if feature.get('name') in const.SUPPORTED_COUNTRIES
         }
 
         states = defaultdict(list)
