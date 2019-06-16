@@ -3,6 +3,8 @@ from typing import Iterable
 from django.contrib.gis.db import models as models
 from django.contrib.auth import models as auth_models
 
+from django.contrib.gis.db.models import Subquery
+
 from django.utils import timezone
 from django.contrib.gis import measure
 
@@ -122,6 +124,13 @@ class SiteUser(auth_models.AbstractUser):
             # TODO: Figure out what to do here, this is bad but possible
             raise
 
+    @property
+    def unmet_users(self):
+        return SiteUser.objects. \
+            filter(state=self.state). \
+            exclude(id=self.id). \
+            exclude(id__in=Subquery(self.met_users.values_list('id', flat=True)))
+
     def update_location(self, new_location):
         """
         Called by the middleware to update user's location
@@ -162,6 +171,26 @@ class SiteUser(auth_models.AbstractUser):
         active_rundezvous.ended_at = timezone.now()
         active_rundezvous.save()
 
+    def get_meetable_users_within(self, distance: measure.Distance):
+        """
+        Gets all users less than distance miles away from user
+        Used to find the next user to match with
+        """
+        return self.unmet_users.active().filter(
+            location__distance_lte=(self.location, distance),
+            status=SiteUser.Status.LOOKING,
+        ).order_by_closest_to(self)
+
+    def find_rundezvous_partner(self):
+        """Returns closest eligible user"""
+        partner = self.\
+            get_meetable_users_within(const.MEETUP_DISTANCE_THRESHOLD).first()
+
+        if partner is None:
+            raise SiteUser.DoesNotExist
+        else:
+            return partner
+
     def make_meetup_decision(self, decision: bool):
         rundezvous = self.active_rundezvous
         utr = self.usertorundezvous_set.get(rundezvous=rundezvous)
@@ -171,18 +200,6 @@ class SiteUser(auth_models.AbstractUser):
             utr.save()
         else:
             raise Rundezvous.DecisionTimeoutError
-
-    def find_rundezvous_partner(self):
-        """Returns closest eligible user"""
-        partner = SiteUser.objects \
-            .meetable_users_within(self, const.MEETUP_DISTANCE_THRESHOLD) \
-            .order_by_closest_to(self) \
-            .first()
-
-        if partner is None:
-            raise SiteUser.DoesNotExist
-        else:
-            return partner
 
 
 class Preferences(models.Model):
