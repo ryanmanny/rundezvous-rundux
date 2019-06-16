@@ -5,9 +5,12 @@ from places import const
 
 
 class Country(models.Model):
+    class Meta:
+        verbose_name_plural = 'countries'
+
     objects = managers.CountryManager()
 
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, unique=True)
 
     region = models.MultiPolygonField(srid=const.DEFAULT_SRID)
 
@@ -19,6 +22,9 @@ class Country(models.Model):
 
 
 class State(models.Model):
+    class Meta:
+        unique_together = ('country', 'name')
+
     objects = managers.StateManager()
 
     country = models.ForeignKey(
@@ -46,6 +52,9 @@ class State(models.Model):
             return self.country.projection_srid
         else:
             return self._projection_srid
+
+    def __str__(self):
+        return f"{self.name} ({self.country})"
 
 
 class Landmark(models.Model):

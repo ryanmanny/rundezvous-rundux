@@ -8,9 +8,16 @@ class CountryAdmin(admin.GeoModelAdmin):
     class StateInline(admin.TabularInline):
         model = models.State
 
+        exclude = ('region',)
+
         extra = 0
 
     inlines = [StateInline]
+
+
+@admin.register(models.State)
+class StateAdmin(admin.GeoModelAdmin):
+    model = models.State
 
 
 @admin.register(models.Landmark)
