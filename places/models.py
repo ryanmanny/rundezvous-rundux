@@ -53,6 +53,10 @@ class State(models.Model):
         else:
             return self._projection_srid
 
+    @projection_srid.setter
+    def projection_srid(self, value):
+        self._projection_srid = value
+
     def __str__(self):
         return f"{self.name} ({self.country})"
 

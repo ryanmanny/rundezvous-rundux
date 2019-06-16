@@ -16,7 +16,7 @@ class TestCountryModel(TestCase):
                 (50.0, 50.0),
                 (50.0, 0.0),
                 (0.0, 0.0),
-            ))
+            )),
         )
         polygon2 = MultiPolygon(
             Polygon((
@@ -25,7 +25,7 @@ class TestCountryModel(TestCase):
                 (150.0, 150.0),
                 (150.0, 100.0),
                 (100.0, 100.0),
-            ))
+            )),
         )
 
         cls.country1 = models.Country.objects.create(
@@ -50,6 +50,46 @@ class TestCountryModel(TestCase):
         with self.assertRaises(models.Country.DoesNotExist):
             models.Country.objects.get_for_point(point_in_no_region)
 
+
+class TestStateModel(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.country = models.Country.objects.create(
+            name='Arbitrary Square Federation',
+            region=MultiPolygon(
+                Polygon((
+                    (0.0, 0.0),
+                    (0.0, 50.0),
+                    (50.0, 50.0),
+                    (50.0, 0.0),
+                    (0.0, 0.0),
+                )),
+            ),
+            projection_srid=1337,
+        )
+
+        cls.state = models.State.objects.create(
+            name='Imperially Captured Arbitrary Square',
+            region=MultiPolygon(
+                Polygon((
+                    (10.0, 10.0),
+                    (10.0, 40.0),
+                    (40.0, 40.0),
+                    (40.0, 10.0),
+                    (10.0, 10.0),
+                )),
+            ),
+            country=cls.country,
+        )
+
+    def test_projection_srid_inheritance(self):
+        self.assertEqual(self.state.projection_srid, 1337)
+
+    def test_projection_srid_shadowing(self):
+        self.state.projection_srid = 404
+        self.state.save()
+
+        self.assertEqual(self.state.projection_srid, 404)
 
 # class TestImportCountries(TestCase):
 #     def test_import_countries(self):
