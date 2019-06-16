@@ -23,7 +23,6 @@ from rundezvous import views as run_views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('run/', include('rundezvous.urls')),
-    path('places/', include('places.urls')),
 
     path('', run_views.home, name='home'),
 

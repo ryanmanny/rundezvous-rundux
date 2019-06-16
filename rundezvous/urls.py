@@ -4,6 +4,7 @@ from rundezvous import views
 
 
 urlpatterns = [
+    path('update_location', views.update_location, name='update_location'),
     path('location_required', views.location_required, name='location_required'),
 
     path('rundezvous_router', views.rundezvous_router, name='rundezvous_router'),
