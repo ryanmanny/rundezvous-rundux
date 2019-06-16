@@ -6,7 +6,7 @@ from django.contrib.gis.geos import Point, Polygon, MultiPolygon
 from places import models
 
 
-class TestSupportedRegionModel(TestCase):
+class TestCountryModel(TestCase):
     @classmethod
     def setUpTestData(cls):
         polygon1 = MultiPolygon(
@@ -28,11 +28,11 @@ class TestSupportedRegionModel(TestCase):
             ))
         )
 
-        cls.region1 = models.Country.objects.create(
+        cls.country1 = models.Country.objects.create(
             name='Arbitrary Square 1',
             region=polygon1,
         )
-        cls.region2 = models.Country.objects.create(
+        cls.country2 = models.Country.objects.create(
             name='Arbitrary Square 2',
             region=polygon2,
         )
@@ -40,9 +40,9 @@ class TestSupportedRegionModel(TestCase):
     def test_point_in_region(self):
         point_in_region1 = Point(25.0, 25.0)
 
-        region = models.Country.objects.get_for_point(point_in_region1)
+        country = models.Country.objects.get_for_point(point_in_region1)
 
-        self.assertEqual(region, self.region1)
+        self.assertEqual(country, self.country1)
 
     def test_point_in_no_region(self):
         point_in_no_region = Point(-25.0, -25.0)
