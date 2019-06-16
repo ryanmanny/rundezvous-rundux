@@ -52,9 +52,9 @@ class SiteUser(auth_models.AbstractUser):
         blank=True,
         srid=place_const.DEFAULT_SRID,
     )
-    country = models.ForeignKey(
-        place_models.Country,
-        verbose_name="last known country",
+    state = models.ForeignKey(
+        place_models.State,
+        verbose_name="last known state",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -139,7 +139,7 @@ class SiteUser(auth_models.AbstractUser):
         # The user's location is stored in lat long (srid=4326) so it must be
         # transformed into a coordinate system measure in meters before the
         # distance between the two points can be calculated
-        srid = self.region.projected_srid  # The default
+        srid = self.state.projection_srid  # The default
 
         location = self.location. \
             transform(srid, clone=True)
