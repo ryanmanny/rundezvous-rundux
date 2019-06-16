@@ -173,14 +173,13 @@ class SiteUser(auth_models.AbstractUser):
             raise Rundezvous.DecisionTimeoutError
 
     def find_rundezvous_partner(self):
+        """Returns closest eligible user"""
         partner = SiteUser.objects \
             .meetable_users_within(self, const.MEETUP_DISTANCE_THRESHOLD) \
             .order_by_closest_to(self) \
             .first()
 
         if partner is None:
-            self.status = self.Status.LOOKING
-            self.save()
             raise SiteUser.DoesNotExist
         else:
             return partner
