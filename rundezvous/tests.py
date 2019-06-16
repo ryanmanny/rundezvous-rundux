@@ -2,20 +2,26 @@ from django.test import TestCase
 
 from django.shortcuts import reverse
 
+from django.contrib.gis.geos import Point
+
 from rundezvous import models
 
 
 class UserTestCase(TestCase):
-    def setUp(self):
-        super().setUp()
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
 
         # Don't store user on self since it won't get update
-        user = models.SiteUser.objects.create(
+        cls.user_instance = models.SiteUser.objects.create(
             username='criminal_scum',
             email='inmate@private.prison',
             password='1234',
+            location=Point(-117.1701676, 46.7316913),  # Honors Hall
         )
-        self.client.force_login(user)
+
+    def setUp(self):
+        self.client.force_login(self.user_instance)
 
     @property
     def user(self):
