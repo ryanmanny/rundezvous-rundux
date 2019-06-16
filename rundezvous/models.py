@@ -47,14 +47,14 @@ class SiteUser(auth_models.AbstractUser):
 
     # LOCATION DATA
     location = models.PointField(  # For position-based game elements
-        verbose_name="Last Known Location",
+        verbose_name="last known location",
         null=True,
         blank=True,
         srid=place_const.DEFAULT_SRID,
     )
-    region = models.ForeignKey(
-        place_models.SupportedRegion,
-        verbose_name="Last Known Region",
+    country = models.ForeignKey(
+        place_models.Country,
+        verbose_name="last known country",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -131,30 +131,8 @@ class SiteUser(auth_models.AbstractUser):
 
         self.save()
 
-        # TODO: Maybe this should only happen on log in, could get slow
-        # self.update_region()
-        # if self.region is None:
-        #     # User not in any supported region
-        #     raise place_models.SupportedRegion.UnsupportedRegionError
-
         if self.active_rundezvous and self.check_rundezvous_arrived():
             self.handle_rundezvous_arrival()
-
-    def update_region(self):
-        """
-        Uses User.location to update user's region
-        """
-        try:
-            region = place_models.SupportedRegion.\
-                objects.get_for_point(self.location)
-        except place_models.SupportedRegion.DoesNotExist:
-            region = None
-        except place_models.SupportedRegion.MultipleObjectsReturned:
-            # TODO: Consider overlapping regions, maybe log collisions here
-            raise NotImplementedError
-
-        self.region = region
-        self.save()
 
     def check_rundezvous_arrived(self):
         """Returns whether user is within threshold of Rundezvous"""
@@ -200,17 +178,18 @@ class SiteUser(auth_models.AbstractUser):
         else:
             raise Rundezvous.DecisionTimeoutError
 
-    def find_partner(self):
+    def find_rundezvous_partner(self):
         partner = SiteUser.objects \
             .meetable_users_within(self, const.MEETUP_DISTANCE_THRESHOLD) \
-            .order_by_closest_to(self).first()
+            .order_by_closest_to(self) \
+            .first()
 
         if partner is None:
             self.status = self.Status.LOOKING
             self.save()
             raise SiteUser.DoesNotExist
         else:
-            return Rundezvous.create_for_users([self, partner])
+            return partner
 
 
 class Preferences(models.Model):
@@ -267,7 +246,7 @@ class Review(models.Model):
 
 class Rundezvous(models.Model):
     """
-    The titular unit of data, describes the meetup between two+ users
+    The titular unit of countries, describes the meetup between two+ users
     When a Rundezvous is first created it is just a Chatroom
     """
     class Meta:
@@ -303,7 +282,7 @@ class Rundezvous(models.Model):
         validators=[
             MinValueValidator(0),
             MaxValueValidator(const.MAX_RUNDEZVOUS_EXPIRATION.seconds),
-        ],
+        ]
     )
 
     # TODO: Add archival logic
@@ -368,11 +347,11 @@ class Rundezvous(models.Model):
 
         users = self.users
 
-        region = users.first().region  # Assume they're all in the same region
+        state = users.first().state  # Assume they're all in the same state
         midpoint = users.get_midpoint()
 
         # Get closest Landmark
-        landmark = place_models.Landmark.objects.filter(region=region) \
+        landmark = place_models.Landmark.objects.filter(state=state) \
             .order_by_closest_to(midpoint).first()
 
         self.landmark = landmark

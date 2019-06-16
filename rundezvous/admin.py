@@ -23,7 +23,7 @@ class SiteUserAdmin(admin.GeoModelAdmin):
         'active_rundezvous',  # Add a link?
     )
 
-    list_display = ('email', 'region',)
+    list_display = ('email', 'country',)
 
     fieldsets = [
         ('User', {
@@ -47,7 +47,7 @@ class SiteUserAdmin(admin.GeoModelAdmin):
                 'location',
                 'latitude',
                 'longitude',
-                'region',
+                'country',
                 'location_updated_at',
             ),
         }),

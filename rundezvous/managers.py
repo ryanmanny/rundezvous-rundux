@@ -42,7 +42,7 @@ class SiteUserSet(models.QuerySet):
         met_users = user.met_users.values_list('id', flat=True)  # Symmetrical
 
         return self.filter(
-            region=user.region,
+            country=user.country,
         ).exclude(
             id=user.id,  # Has everyone met themselves?
         ).exclude(  # CHAIN, don't combine
