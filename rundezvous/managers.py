@@ -39,7 +39,7 @@ class SiteUserSet(models.QuerySet):
         """
         Gets all users within current region who user has not met with yet
         """
-        met_users = user.met_users.values_list('id', flat=True)  # Symmetrical
+        met_users = user.met_users.values_list('id', flat=True)
 
         return self.filter(
             country=user.country,
