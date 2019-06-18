@@ -45,9 +45,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.gis',
 
-    # Third-party apps
-    'crispy_forms',
-
     # Rundezvous Apps
     'rundezvous.apps.RundezvousConfig',
     'places.apps.PlacesConfig',
@@ -150,5 +147,3 @@ AUTH_USER_MODEL = 'rundezvous.SiteUser'
 
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
-
-CRISPY_TEMPLATE_PACK = 'bootstrap3'
