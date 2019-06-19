@@ -54,7 +54,17 @@ class TestRegistration(FunctionalTest):
 
 
 class TestRundezvous(FunctionalTest):
-    @skip
+    fixtures = ['two_users.json']
+
     def test_rundezvous(self):
         # Jumbo has his running shoes on already, and a condom in his wallet
-        ...
+        self.browser1 = webdriver.Firefox()
+        self.browser2 = webdriver.Firefox()
+
+        self.login(self.browser1, 'user1', 'stupidpassword')
+        self.login(self.browser2, 'user2', 'stupidpassword')
+
+        self.fail("Finish the test!")
+
+        self.browser1.quit()
+        self.browser2.quit()
