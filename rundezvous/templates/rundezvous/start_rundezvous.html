@@ -1,0 +1,21 @@
+{% extends 'rundezvous/base.html' %}
+
+{% block content %}
+<div>
+    <div id="id_start_rundezvous" onclick="start_rundezvous()">
+        Start Rundezvous
+    </div>
+</div>
+{% endblock %}
+
+<script>
+    let start_rundezvous = function() {
+        let url = "{% url 'rundezvous_router' %}";
+        $.get({
+            'url': url,
+            'params': {
+                'start': true,
+            }
+        })
+    }
+</script>

@@ -80,8 +80,12 @@ def rundezvous_router(request):
     user = request.user
 
     if user.status == models.SiteUser.Status.NONE:
-        user.status = models.SiteUser.Status.LOOKING
-        user.save()
+        if request.GET.get('start'):
+            user.status = models.SiteUser.Status.LOOKING
+            user.save()
+            return redirect(reverse('waiting_room'))
+        else:
+            return render(request, 'rundezvous/start_rundezvous.html', {})
 
     if user.status == models.SiteUser.Status.LOOKING:
         return redirect(reverse('waiting_room'))
