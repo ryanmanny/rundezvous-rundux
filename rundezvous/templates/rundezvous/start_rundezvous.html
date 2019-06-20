@@ -2,20 +2,8 @@
 
 {% block content %}
 <div>
-    <div id="id_start_rundezvous" onclick="start_rundezvous()">
+    <a id="id_start_rundezvous" href="{% url 'start-rundezvous' %}">
         Start Rundezvous
-    </div>
+    </a>
 </div>
 {% endblock %}
-
-<script>
-    let start_rundezvous = function() {
-        let url = "{% url 'rundezvous_router' %}";
-        $.get({
-            'url': url,
-            'params': {
-                'start': true,
-            }
-        })
-    }
-</script>
