@@ -46,6 +46,9 @@ def update_location(request):
     Update a user's location
     This would be pretty easy to spoof TODO: Analyze if that would be a problem
     """
+    if request.user.is_anonymous:
+        return JsonResponse({})
+
     try:
         lat = float(request.POST.get('lat'))
         long = float(request.POST.get('long'))
