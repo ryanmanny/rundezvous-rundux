@@ -17,9 +17,7 @@ from rundezvous import const
 # SiteUser
 class SiteUserSet(models.QuerySet):
     def get_midpoint(self) -> Point:
-        """
-        Aggregates midpoint from all User.locations
-        """
+        """Aggregates midpoint from all User.locations"""
         return self.aggregate(
             midpoint=Centroid(  # Centroid calculates the midpoint of a Geometry
                 Collect('location')
@@ -33,9 +31,7 @@ class SiteUserSet(models.QuerySet):
         return self.filter(location_updated_at__gte=user_active_time)
 
     def order_by_closest_to(self, user):
-        """
-        Gets closest compatible user to current user
-        """
+        """Gets closest compatible user to current user"""
         return self \
             .annotate(distance=Distance('location', user.location)) \
             .order_by('distance')
