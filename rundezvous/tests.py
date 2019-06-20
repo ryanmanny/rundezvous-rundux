@@ -37,7 +37,7 @@ class TestUserLocationUpdateView(UserTestCase):
         Testing the automatic functionality would require a functional test
         """
         response = self.client.post(
-            reverse('update_location'),
+            reverse('update-location'),
             {
                 'lat': 55.756496974,
                 'long': 37.623664172,
@@ -51,7 +51,7 @@ class TestUserLocationUpdateView(UserTestCase):
         self.assertEqual(user.longitude, 37.623664172)
 
     def test_location_update_with_missing_location(self):
-        response = self.client.post(reverse('update_location'), follow=True)
+        response = self.client.post(reverse('update-location'), follow=True)
 
         # User should be redirected to the location_required page
         self.assertTemplateUsed(response, 'rundezvous/location_required.html')

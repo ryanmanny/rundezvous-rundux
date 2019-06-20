@@ -17,9 +17,9 @@ from places import const as place_const
 
 def home(request):
     if request.user.is_anonymous:
-        return redirect(reverse('login'))
+        return redirect('login')
     else:
-        return redirect(reverse('rundezvous_router'))
+        return redirect('rundezvous-router')
 
 
 def signup(request):
@@ -54,7 +54,7 @@ def update_location(request):
         long = float(request.POST.get('long'))
     except TypeError:
         # Location services must be on
-        return redirect(reverse('location_required'))
+        return redirect('location-required')
 
     user = request.user
 
@@ -78,7 +78,7 @@ def location_required(request):
 
 
 @login_required
-def rundezvous_router(request):
+def router(request):
     """Routes user to appropriate destination based on their status"""
     user = request.user
 
@@ -86,13 +86,13 @@ def rundezvous_router(request):
         return render(request, 'rundezvous/start_rundezvous.html', {})
 
     if user.status == models.SiteUser.Status.LOOKING:
-        return redirect(reverse('waiting_room'))
+        return redirect('waiting-room')
     elif user.status == models.SiteUser.Status.CHATTING:
-        return redirect(reverse('chatroom'))
+        return redirect('chatroom')
     elif user.status == models.SiteUser.Status.RUNNING:
-        return redirect(reverse('active_rundezvous'))
+        return redirect('active-rundezvous')
     elif user.status == models.SiteUser.Status.REVIEW:
-        return redirect(reverse('review'))
+        return redirect('review')
     else:
         raise NotImplementedError
 
@@ -104,7 +104,7 @@ def start(request):
 
     user.status = models.SiteUser.Status.LOOKING
     user.save()
-    return redirect('rundezvous_router')
+    return redirect('rundezvous-router')
 
 
 @login_required
@@ -120,7 +120,7 @@ def waiting_room(request):
         return render(request, 'rundezvous/waiting_room.html')
     else:
         models.Rundezvous.create_for_users([user, partner])
-        return redirect('active_rundezvous')
+        return redirect('active-rundezvous')
 
 
 @login_required
