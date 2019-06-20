@@ -33,14 +33,19 @@ class SiteUser(auth_models.AbstractUser):
         null=True,
         blank=True,
     )
+
+    MALE = 'M'
+    FEMALE = 'F'
+    OTHER = 'O'
+
     gender = models.CharField(
         max_length=1,
         choices=[
-            ('M', 'Male'),
-            ('F', 'Female'),
-            ('O', 'Other'),
+            (MALE, 'Male'),
+            (FEMALE, 'Female'),
+            (OTHER, 'Other'),
         ],
-        default='M',  # Women's movement over
+        default=FEMALE,  # Female is actually the default biological gender
     )
     # display_color TODO: Import django-colorpicker
     reputation = models.IntegerField(

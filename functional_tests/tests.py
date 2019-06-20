@@ -1,20 +1,14 @@
 import time
 
-from .base import FunctionalTest
 from unittest import skip
 
-from selenium import webdriver
+from .base import FunctionalTest, MatchingUsersFunctionalTest
+
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.common.keys import Keys
 
 
 class TestRegistration(FunctionalTest):
-    def setUp(self):
-        self.browser = webdriver.Firefox()
-
-    def tearDown(self):
-        self.browser.quit()
-
     def test_user_can_register(self):
         # Jimmy has heard of Rundezvous from a friend and wants to try it out
         # He is a skeptical guy and just wants to poke around
@@ -53,18 +47,7 @@ class TestRegistration(FunctionalTest):
         # However, I sell his email to the Russians anyway
 
 
-class TestRundezvous(FunctionalTest):
-    fixtures = ['two_users.json']
-
+class TestRundezvous(MatchingUsersFunctionalTest):
+    @skip
     def test_rundezvous(self):
-        # Jumbo has his running shoes on already, and a condom in his wallet
-        self.browser1 = webdriver.Firefox()
-        self.browser2 = webdriver.Firefox()
-
-        self.login(self.browser1, 'user1', 'stupidpassword')
-        self.login(self.browser2, 'user2', 'stupidpassword')
-
         self.fail("Finish the test!")
-
-        self.browser1.quit()
-        self.browser2.quit()
