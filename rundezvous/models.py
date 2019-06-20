@@ -181,14 +181,14 @@ class SiteUser(auth_models.AbstractUser):
         Gets all users less than distance miles away from user
         Used to find the next user to match with
         """
-        return self.unmet_users.active().filter(
+        return self.unmet_users.filter_by_active().filter(
             location__distance_lte=(self.location, distance),
             status=SiteUser.Status.LOOKING,
         ).order_by_closest_to(self)
 
     def find_rundezvous_partner(self):
         """Returns closest eligible user"""
-        partner = self.\
+        partner = self. \
             get_meetable_users_within(const.MEETUP_DISTANCE_THRESHOLD).first()
 
         if partner is None:

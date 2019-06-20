@@ -26,10 +26,8 @@ class SiteUserSet(models.QuerySet):
             )
         )['midpoint']
 
-    def active(self):
-        """
-        Filters out users who haven't updated their location lately
-        """
+    def filter_by_active(self):
+        """Filters out users who haven't updated their location lately"""
         user_active_time = timezone.now() - const.USER_ACTIVE_TIME
 
         return self.filter(location_updated_at__gte=user_active_time)
@@ -44,8 +42,7 @@ class SiteUserSet(models.QuerySet):
 
 
 class SiteUserManager(auth_models.UserManager.from_queryset(SiteUserSet)):
-    def active(self):
-        return self.get_queryset().active()
+    pass
 
 
 # Rundezvous

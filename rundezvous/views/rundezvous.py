@@ -110,7 +110,17 @@ def start(request):
 @login_required
 def waiting_room(request):
     """Waiting room for the user while the next Rundezvous is found"""
-    raise NotImplementedError
+    user = request.user
+
+    # There are two cases: a match can be found instantly, or it can't
+
+    try:
+        partner = user.find_rundezvous_partner()
+    except models.SiteUser.DoesNotExist:
+        return render(request, 'rundezvous/waiting_room.html')
+    else:
+        models.Rundezvous.create_for_users([user, partner])
+        return redirect('active_rundezvous')
 
 
 @login_required
@@ -119,11 +129,16 @@ def active_rundezvous(request):
     Screen displayed while the user is running to the destination
     Will show Google Maps frame, and will automatically detect arrival
     """
+    user = request.user
+    rundezvous = user.active_rundezvous
+    partners = rundezvous.users.exclude(id=user.id)
+
     return render(
         request,
         'rundezvous/active_rundezvous.html',
         {
-            'rundezvous': request.user.active_rundezvous,
+            'rundezvous': rundezvous,
+            'partners': partners,
         },
     )
 

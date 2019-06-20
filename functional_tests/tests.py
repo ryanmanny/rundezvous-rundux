@@ -48,6 +48,15 @@ class TestRegistration(FunctionalTest):
 
 
 class TestRundezvous(MatchingUsersFunctionalTest):
-    @skip
     def test_rundezvous(self):
+        # Jose is desperately hoping to find a match this time
+        # He already has his running shoes on and a condom in his pocket
+        self.male.find_element_by_id('id_start_rundezvous').click()
+
+        time.sleep(2.0)
+
+        # Nearby, Emily is hoping to have a better Rundezvous than last time
+        self.female.find_element_by_id('id_start_rundezvous').click()
+        self.assertIn("Match Found!", self.female.page_source)
+
         self.fail("Finish the test!")

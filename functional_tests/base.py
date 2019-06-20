@@ -4,8 +4,10 @@ from selenium import webdriver
 
 from model_mommy import mommy
 
-from django.test import LiveServerTestCase
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test import tag
+
+from django.contrib.gis.geos import Point
 
 from rundezvous.models import SiteUser
 
@@ -18,6 +20,7 @@ def create_user(gender):
     password = 'password'
 
     user = mommy.make('rundezvous.SiteUser', gender=gender)
+    user.update_location(Point(-117.1701676, 46.7316913))
     user.set_password(password)
     user.save()
 
@@ -31,7 +34,7 @@ def create_user(gender):
 
 
 @tag('functional')
-class AbstractFunctionalTest(LiveServerTestCase, metaclass=ABCMeta):
+class AbstractFunctionalTest(StaticLiveServerTestCase, metaclass=ABCMeta):
     def login(self, username, password, browser=None):
         if browser is None:
             browser = self.browser
